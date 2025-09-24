@@ -1,4 +1,3 @@
-
 from utils import DEVICE, EMBEDDING_DIM, HIDDEN_DIM, BATCH_SIZE, EPOCHS, MAX_LEN, LEARNING_RATE, set_seed
 from preprocessing import prepare_data
 import torch
@@ -15,33 +14,30 @@ test_path = './data/twitter_validation.csv'
 train_loader, test_loader, vocab, embedding_matrix = prepare_data(train_path, test_path)
 
 
-#Crearte the LSTM model
-class LSTMSentiment(nn.Module):
-    def __init__(self, vocab_size, embed_dim, hidden_dim, num_layers=1):
-        super(LSTMSentiment, self).__init__()
+class MLP(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim):
+        super(MLP, self).__init__()
         self.embedding = nn.Embedding.from_pretrained(embedding_matrix, freeze=False, padding_idx=vocab["<pad>"]) # embedding layer
-        self.lstm = nn.LSTM(embed_dim, hidden_dim, num_layers=num_layers, 
-                            batch_first=True, bidirectional=True) # LSTM layer
-        self.attention = nn.Linear(hidden_dim*2, hidden_dim*2) # Attention layer
-        self.fc = nn.Linear(hidden_dim*2, 4)
-        
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_dim, output_dim)
+        self.sigmoid = nn.Sigmoid()
+    
     def forward(self, x):
-        x = self.embedding(x) # run the embedding layer
-        lstm_out, _ = self.lstm(x) # run lstm layer
+        x = self.embedding(x)
+        x = torch.mean(x, dim=1)
+        out = self.fc1(x)
+        out = self.relu(out)
+        out = self.fc2(out)
+        out = self.sigmoid(out)
+        return out
 
-        att_scores = self.attention(lstm_out) # compute attention scores
-        attn_weights = torch.softmax(att_scores, dim=1) # normalize scores to weights
-
-        context = torch.sum(attn_weights * lstm_out, dim=1) # weighted sum to get context vector
-
-        out = self.fc(context)
-        return out.squeeze()
-
-# Initialize model, loss function, and optimizer
-model = LSTMSentiment(len(vocab), EMBEDDING_DIM, HIDDEN_DIM).to(DEVICE)
+# Initialize model, loss function, and optimiser
+model = MLP(EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, output_dim=4)
 criterion = nn.CrossEntropyLoss()
 optimiser = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5)
+
 
 def init_weights(m):
     if isinstance(m, nn.Linear):
@@ -52,4 +48,3 @@ model.apply(init_weights)
 
 # train the model
 history = train_model(model, train_loader, test_loader, optimiser, criterion, DEVICE, epochs=EPOCHS)
-

@@ -5,17 +5,17 @@ import warnings
 
 from tqdm import tqdm
 
-def train_one_epoch(model, dataloader, optimizer, criterion, device, epoch=None):
+def train_one_epoch(model, dataloader, optimiser, criterion, device, epoch=None):
     model.train()
     total_loss = 0
     loop = tqdm(enumerate(dataloader, start=1), total=len(dataloader), desc=f"Epoch {epoch}")
     for batch_idx, (X, y) in loop:
         X, y = X.to(device), y.to(device)
-        optimizer.zero_grad()
+        optimiser.zero_grad()
         preds = model(X)
         loss = criterion(preds, y)
         loss.backward()
-        optimizer.step()
+        optimiser.step()
         total_loss += loss.item()
         # update progress bar with current loss
         loop.set_postfix(loss=loss.item())
