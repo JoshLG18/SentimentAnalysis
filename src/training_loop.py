@@ -24,7 +24,7 @@ def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0) # gradient clipping
         optimiser.step()
         total_loss += loss.item()
-        
+
         # update progress bar with current loss
         loop.set_postfix(loss=loss.item())    
     return total_loss / len(dataloader)
