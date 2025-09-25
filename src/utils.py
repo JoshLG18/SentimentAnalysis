@@ -9,12 +9,12 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # ========== Hyperparameters ==========
-EMBEDDING_DIM = 100
-HIDDEN_DIM = 64
+EMBEDDING_DIM = 300
+HIDDEN_DIM = 512
 BATCH_SIZE = 64
-EPOCHS = 10
+EPOCHS = 100
 MAX_LEN = 300
-LEARNING_RATE = 0.005
+LEARNING_RATE = 1e-3
 LABEL_MAPPING = { # set the label mapping for the dataset
     "negative": 0,
     "neutral": 1,
@@ -36,7 +36,7 @@ def save_metrics_and_history(best_metrics, history,training_time):
     os.makedirs("results", exist_ok=True)
 
     # File to store all results together
-    results_file = "results/all_results.json"
+    results_file = "../results/all_results.json"
 
     # Get current script filename (e.g. train_LSTM.py or train_MLP.py)
     script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
