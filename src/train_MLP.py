@@ -11,8 +11,8 @@ warnings.filterwarnings('ignore')
 
 set_seed()
 
-train_path = './data/twitter_training.csv'
-test_path = './data/twitter_validation.csv'
+train_path = '../data/twitter_training.csv'
+test_path = '../data/twitter_validation.csv'
 train_loader, test_loader, vocab, embedding_matrix = prepare_data(train_path, test_path)
 
 
@@ -44,7 +44,7 @@ criterion = nn.CrossEntropyLoss()
 optimiser = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5)
 
-model_save_loc = './results/saved_models/mlp.pt'
+model_save_loc = '../results/saved_models/mlp.pt'
 
 start_time = time.time() 
 # train the model
