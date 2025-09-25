@@ -1,11 +1,14 @@
 
 from utils import DEVICE, EMBEDDING_DIM, HIDDEN_DIM, BATCH_SIZE, EPOCHS, MAX_LEN, LEARNING_RATE, set_seed
-from preprocessing import prepare_data
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from training_loop import train_model
 import warnings 
+import time
+from preprocessing import prepare_data
+from training_loop import train_model
+from utils import save_metrics_and_history
+
 warnings.filterwarnings('ignore')
 
 set_seed()
@@ -17,7 +20,7 @@ train_loader, test_loader, vocab, embedding_matrix = prepare_data(train_path, te
 
 #Crearte the LSTM model
 class LSTMSentiment(nn.Module):
-    def __init__(self, vocab_size, embed_dim, hidden_dim, num_layers=1):
+    def __init__(self, vocab_size, embed_dim, hidden_dim, num_layers=2):
         super(LSTMSentiment, self).__init__()
         self.embedding = nn.Embedding.from_pretrained(embedding_matrix, freeze=False, padding_idx=vocab["<pad>"]) # embedding layer
         self.lstm = nn.LSTM(embed_dim, hidden_dim, num_layers=num_layers, 
@@ -50,6 +53,14 @@ def init_weights(m):
 
 model.apply(init_weights)
 
-# train the model
-history = train_model(model, train_loader, test_loader, optimiser, criterion, DEVICE, epochs=EPOCHS)
+model_save_loc = './results/saved_models/LSTM.pt'
 
+start_time = time.time() 
+# train the model
+history, best_metrics = train_model(model_save_loc, model, train_loader, test_loader, optimiser, criterion, DEVICE)
+
+end_time = time.time()
+
+training_time = end_time - start_time
+
+save_metrics_and_history(best_metrics, history, training_time)

@@ -1,10 +1,12 @@
 from utils import DEVICE, EMBEDDING_DIM, HIDDEN_DIM, BATCH_SIZE, EPOCHS, MAX_LEN, LEARNING_RATE, set_seed
-from preprocessing import prepare_data
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from training_loop import train_model
 import warnings 
+import time
+from training_loop import train_model
+from preprocessing import prepare_data
+from utils import save_metrics_and_history
 warnings.filterwarnings('ignore')
 
 set_seed()
@@ -15,7 +17,7 @@ train_loader, test_loader, vocab, embedding_matrix = prepare_data(train_path, te
 
 
 class MLP(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim):
+    def __init__(self, input_dim, hidden_dim, output_dim,vocab, embedding_matrix):
         super(MLP, self).__init__()
         self.embedding = nn.Embedding.from_pretrained(embedding_matrix, freeze=False, padding_idx=vocab["<pad>"]) # embedding layer
         self.fc1 = nn.Linear(input_dim, hidden_dim)
@@ -33,7 +35,11 @@ class MLP(nn.Module):
         return out
 
 # Initialize model, loss function, and optimiser
-model = MLP(EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, output_dim=4)
+model = MLP(input_dim=EMBEDDING_DIM,
+            hidden_dim=HIDDEN_DIM,
+            output_dim=4,
+            vocab=vocab,
+            embedding_matrix=embedding_matrix)
 criterion = nn.CrossEntropyLoss()
 optimiser = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5)
@@ -46,5 +52,14 @@ def init_weights(m):
 
 model.apply(init_weights)
 
+model_save_loc = './results/saved_models/mlp.pt'
+
+start_time = time.time() 
 # train the model
-history = train_model(model, train_loader, test_loader, optimiser, criterion, DEVICE, epochs=EPOCHS)
+history, best_metrics = train_model(model_save_loc, model, train_loader, test_loader, optimiser, criterion, DEVICE)
+
+end_time = time.time()
+
+training_time = end_time - start_time
+# save the metrics and history of the best model
+save_metrics_and_history(best_metrics, history, training_time)
