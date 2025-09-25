@@ -1,5 +1,3 @@
-# utils.py
-
 import torch
 import random
 import numpy as np
@@ -11,19 +9,18 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # ========== Hyperparameters ==========
-EMBEDDING_DIM = 50
+EMBEDDING_DIM = 100
 HIDDEN_DIM = 64
 BATCH_SIZE = 64
 EPOCHS = 10
 MAX_LEN = 300
 LEARNING_RATE = 0.005
-LABEL_MAPPING = {
+LABEL_MAPPING = { # set the label mapping for the dataset
     "negative": 0,
     "neutral": 1,
     "positive": 2,
-    "irrelevant": 3  # (if it exists in your dataset)
+    "irrelevant": 3
 }
-
 
 # ========== Seed Setting ==========
 def set_seed(seed: int = 42):
@@ -55,11 +52,11 @@ def save_metrics_and_history(best_metrics, history,training_time):
     }
 
     # Load existing results if they exist
-    if os.path.exists(results_file):
+    if os.path.exists(results_file): # checks if the file exists
         with open(results_file, "r") as f:
             all_results = json.load(f)
     else:
-        all_results = {}
+        all_results = {} # if not create the dictionary
 
     # Update only this model’s entry
     all_results[script_name] = entry
