@@ -28,77 +28,74 @@ def load_data(train_loc, val_loc, test_size=0.2, random_state=123):
     full_data = full_data.drop(columns=["ID", "Object"])
     full_data = full_data.rename(columns={"Tweet": "text", "Sentiment": "label"})
     full_data["text"] = full_data["text"].astype(str)
-    # normalise labels to lowercase strings and drop anything unexpected
-    full_data["label"] = full_data["label"].astype(str).str.strip().str.lower()
-    full_data = full_data[full_data["label"].isin(LABEL_MAPPING.keys())]
+
+    # Normalise labels to lowercase strings and drop anything unexpected
+    full_data["label"] = full_data["label"].astype(str).str.strip().str.lower() # make sure label is str, strip the lable and make it lower
+    full_data = full_data[full_data["label"].isin(LABEL_MAPPING.keys())] # assign the label a mapping 
 
 
     # Train/test split
     train_df, test_df = train_test_split(full_data, test_size=test_size, random_state=random_state)
     return train_df.reset_index(drop=True), test_df.reset_index(drop=True)
 
-
-# ========== Tokenizer & GloVe ==========
-tokenizer = get_tokenizer("basic_english") # defines the tokenizer which splits sentences into indivdual words
+#  get tokeniser and glove
+tokeniser = get_tokenizer("basic_english") # defines the tokenizer which splits sentences into indivdual words
 glove = GloVe(name="6B", dim=EMBEDDING_DIM)
 
 
-def yield_glove_tokens(data_iter):
-    """Yield tokens that exist in GloVe vocab (for vocab building)."""
+def create_glove_tokens(data_iter):
     for _, row in data_iter.iterrows(): # loops though all the rows in the training df and tokenises the tweet
-        tokens = tokenizer(row["text"])
+        tokens = tokeniser(row["text"]) # tokenise the tweet
         yield [t for t in tokens if t in glove.stoi] # only keeps tokens that exist in the glove dictionary
 
 
 def build_vocab(train_df): # builds a mapping between words and ids
-    """Build vocab restricted to tokens in GloVe embeddings."""
-    vocab = build_vocab_from_iterator(yield_glove_tokens(train_df), specials=["<pad>", "<unk>"]) # adds special tokens e.g. pad to make sure all sentences are the same length. unk = unknown word
+    vocab = build_vocab_from_iterator(create_glove_tokens(train_df), specials=["<pad>", "<unk>"]) # adds special tokens e.g. pad to make sure all sentences are the same length. unk = unknown word
     vocab.set_default_index(vocab["<unk>"]) # sets the default index to unknown
     return vocab
 
-
-# ========== Preprocessing ==========
+#  processing 
 def preprocess(example, vocab=None): # tokenises the text - converts each token into interger from the vocab
     text = str(example["text"])
-    tokens = tokenizer(text)
+    tokens = tokeniser(text) # tokenise text
     input_ids = vocab(tokens)[:MAX_LEN]
-    label_str = str(example["label"]).strip().lower()
-    label = LABEL_MAPPING[label_str]          # <-- no int() here
+    label_str = str(example["label"]).strip().lower() # make sure str, strip the label and make lower
+    label = LABEL_MAPPING[label_str]  
     return {"input_ids": input_ids, "label": label}
 
+def make_batches(batch):
+    texts, labels = [], []
+    for sample in batch:
+        # Ensure non-empty input_ids
+        input_ids = sample["input_ids"]
+        if len(input_ids) == 0:
+            input_ids = [vocab["<unk>"]]  # fallback: unknown token
 
-# ========== Collate Function ==========
-def collate_batch(batch):
-    texts = [torch.tensor(sample["input_ids"], dtype=torch.int64) for sample in batch]
-    labels = [sample["label"] for sample in batch]  # already int
+        texts.append(torch.tensor(input_ids, dtype=torch.long))
+        labels.append(int(sample["label"]))  # force int
+
+    # Pad
     texts_padded = pad_sequence(texts, batch_first=True, padding_value=vocab["<pad>"])
-    labels = torch.tensor(labels, dtype=torch.long)  # shape (batch_size,)
+    labels = torch.tensor(labels, dtype=torch.long)
+
     return texts_padded, labels
 
-# ========== Embedding Matrix ==========
-def build_embedding_matrix(vocab, embedding_dim=EMBEDDING_DIM):
+#  create embedding matrix 
+def create_embedding_matrix(vocab, embedding_dim=EMBEDDING_DIM):
     # creates an embedding matrix 
     # where each row corresponds to a word in the vocab
     # if the word exists in Glove include its embedding, if not assign random embedding
     embedding_matrix = torch.zeros(len(vocab), embedding_dim)
     for idx, token in enumerate(vocab.get_itos()):
-        if token in glove.stoi:
-            embedding_matrix[idx] = glove[token]
+        if token in glove.stoi: # check if the word exists in the glove dictionary
+            embedding_matrix[idx] = glove[token] # assign the word with a glove token
         else:
-            embedding_matrix[idx] = torch.randn(embedding_dim) * 0.6
+            embedding_matrix[idx] = torch.randn(embedding_dim) * 0.1 # if the word is unknown give it a random value
     return embedding_matrix # returns a matrix that can be fed directly into the embedding layer, speeds up training
 
 
-# ========== Main Setup Pipeline ==========
+#  Processing Pipeline 
 def prepare_data(train_path, val_path):
-    """
-    Full pipeline:
-    - Load data
-    - Build vocab
-    - tokenise the text
-    - Apply preprocessing
-    - Return DataLoaders + embedding matrix
-    """
     # Load dataframes
     train_df, test_df = load_data(train_path, val_path)
 
@@ -106,28 +103,29 @@ def prepare_data(train_path, val_path):
     global vocab
     vocab = build_vocab(train_df)
 
-    # Convert pandas -> HuggingFace Dataset
+    # Convert pandas -> HuggingFace Dataset so can be passed to transformers later
     train_dataset = Dataset.from_pandas(train_df)
     test_dataset = Dataset.from_pandas(test_df)
 
-    # ===== in prepare_data(): pass vocab explicitly to map =====
+    # Map vocab to indexes
     train_dataset = train_dataset.map(lambda ex: preprocess(ex, vocab))
     test_dataset  = test_dataset.map(lambda ex: preprocess(ex, vocab))
 
+    print(set(train_dataset["label"]))
 
     # Set format for PyTorch
     train_dataset.set_format(type="torch", columns=["input_ids", "label"])
     test_dataset.set_format(type="torch", columns=["input_ids", "label"])
-
-    # DataLoaders
+  
+    # create the dataloaders
     train_loader = DataLoader(
-        train_dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_batch
+        train_dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=make_batches
     )
     test_loader = DataLoader(
-        test_dataset, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_batch
+        test_dataset, batch_size=BATCH_SIZE, shuffle=False, collate_fn=make_batches
     )
 
-    # Embeddings
-    embedding_matrix = build_embedding_matrix(vocab)
+    # create the embedding matrix
+    embedding_matrix = create_embedding_matrix(vocab)
 
     return train_loader, test_loader, vocab, embedding_matrix

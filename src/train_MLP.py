@@ -44,19 +44,11 @@ criterion = nn.CrossEntropyLoss()
 optimiser = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5)
 
-
-def init_weights(m):
-    if isinstance(m, nn.Linear):
-        nn.init.xavier_uniform_(m.weight)
-        nn.init.zeros_(m.bias)
-
-model.apply(init_weights)
-
 model_save_loc = './results/saved_models/mlp.pt'
 
 start_time = time.time() 
 # train the model
-history, best_metrics = train_model(model_save_loc, model, train_loader, test_loader, optimiser, criterion, DEVICE)
+history, best_metrics = train_model(model_save_loc, model, train_loader, test_loader, optimiser,scheduler, criterion, DEVICE)
 
 end_time = time.time()
 

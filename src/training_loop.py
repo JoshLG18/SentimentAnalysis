@@ -1,24 +1,32 @@
 # training_loop.py
 import torch
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
-import warnings
 from utils import EPOCHS
 from tqdm import tqdm
 
-def train_one_epoch(model, dataloader, optimiser, criterion, device):
+def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
     model.train()
     total_loss = 0
+
     loop = tqdm(enumerate(dataloader, start=1), total=len(dataloader), desc=f"Training")
+
     for batch_idx, (X, y) in loop:
         X, y = X.to(device), y.to(device)
         optimiser.zero_grad()
         preds = model(X)
         loss = criterion(preds, y)
+
+        if torch.isnan(loss) or torch.isinf(loss):
+            print(f"⚠️ NaN/Inf loss at batch {batch_idx}, skipping update")
+            continue
+
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0) # gradient clipping
         optimiser.step()
         total_loss += loss.item()
+        
         # update progress bar with current loss
-        loop.set_postfix(loss=loss.item())
+        loop.set_postfix(loss=loss.item())    
     return total_loss / len(dataloader)
 
 
@@ -50,7 +58,7 @@ def evaluate(model, dataloader, criterion, device):
     }
 
 
-def train_model(save_path,model, train_loader, val_loader, optimizer, criterion, device, epochs=EPOCHS, patience=3):
+def train_model(save_path,model, train_loader, val_loader, optimiser,scheduler, criterion, device, epochs=EPOCHS, patience=3):
     history = {"train_loss": [], "val_loss": [], "accuracy": [], "precision": [], "recall": [], "f1": []}
     
     best_val_loss = float("inf")
@@ -58,7 +66,7 @@ def train_model(save_path,model, train_loader, val_loader, optimizer, criterion,
     best_metrics = None  # to store metrics of best model
 
     for epoch in range(epochs):
-        train_loss = train_one_epoch(model, train_loader, optimizer, criterion, device)
+        train_loss = train_one_epoch(model, train_loader, optimiser,scheduler, criterion, device)
         metrics = evaluate(model, val_loader, criterion, device)
 
         # Logging
