@@ -13,8 +13,8 @@ from utils import save_metrics_and_history
 warnings.filterwarnings('ignore')
 set_seed()
 
-train_path = './data/twitter_training.csv'
-test_path = './data/twitter_validation.csv'
+train_path = '../data/twitter_training.csv'
+test_path = '../data/twitter_validation.csv'
 train_loader, test_loader, vocab, embedding_matrix = prepare_data(train_path, test_path)
 
 #Create the Transformer
@@ -76,7 +76,7 @@ scheduler = get_cosine_schedule_with_warmup(
     num_warmup_steps=len(train_loader)*2,  # warmup 2 epochs
     num_training_steps=EPOCHS*len(train_loader)
 )
-model_save_loc = './results/saved_models/transformer.pt'
+model_save_loc = '../results/saved_models/transformer.pt'
 
 start_time = time.time() 
 # train the model
