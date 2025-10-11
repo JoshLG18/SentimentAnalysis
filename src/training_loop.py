@@ -138,7 +138,7 @@ def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler
             best_val_loss = metrics["loss"]
             best_metrics = metrics.copy()
             best_metrics["train_loss"] = train_loss
-            torch.save(model.state_dict(), save_path)
+            torch.save(model.classifier.state_dict(), save_path)
             patience_counter = 0
             print(f"✅ New best model saved at epoch {epoch+1} with val_loss={best_val_loss:.4f}")
         else:
@@ -147,5 +147,5 @@ def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler
                 print("⏹ Early stopping triggered")
                 break
 
-    model.load_state_dict(torch.load(save_path))
+    model.classifier.load_state_dict(torch.load(save_path))
     return history, best_metrics
