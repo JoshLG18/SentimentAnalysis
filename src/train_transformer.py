@@ -14,7 +14,7 @@ warnings.filterwarnings('ignore')
 set_seed()
 
 # Load processed data
-train_loader, test_loader, tokenizer = prepare_data()
+train_loader, test_loader = prepare_data()
 
 
 # === Define Transformer Model Using FinBERT ===
