@@ -12,7 +12,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 HIDDEN_DIM = 256
 BATCH_SIZE = 64
 EPOCHS = 100
-LEARNING_RATE = 1e-3
+LEARNING_RATE = 1e-4
 
 # ========== Seed Setting ==========
 def set_seed(seed: int = 123):

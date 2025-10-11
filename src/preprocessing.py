@@ -34,7 +34,7 @@ def prepare_data(test_size=0.2, random_state=123):
 
     # Tokenisation
     def tokenize(example):
-        return tokenizer(example["text"], truncation=True, padding=False)
+        return tokenizer(example["text"], truncation=True, padding=False,max_length=64)
 
     train_ds = train_ds.map(tokenize, batched=True) # tokenises the dataset using finbert
     test_ds = test_ds.map(tokenize, batched=True) # tokenises the dataset using finbert
