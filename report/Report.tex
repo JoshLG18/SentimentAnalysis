@@ -17,7 +17,7 @@
 
 %-------------------------------------------------------%
 
-\title{\bf Comparative Evaluation of Neural Architectures for Sentiment Analysis on Twitter Data: From MLPs to Transformers}
+\title{\bf Comparative Evaluation of Neural Architectures for Sentiment Analysis on Financial News: From MLPs to Transformers}
 \author{Josh Le Grice - 720017170}
 \date{}
 \maketitle
@@ -29,50 +29,42 @@
 % Background and motivation: why this question matters.
 % Clear statement of your research question.
 % Context or prior work if relevant.
-Explain the background, motivation, and clearly state your research question. It is likely that you will incorporate several references to support your argument's significance and to acknowledge previous studies~\cite{sato2016majorana}.
+Traditional financial models are reliant on pure quantative data such as stock prices and macroeconomic indicators.
+However, markets do not move on numbers alone. 
+Increasingly, sentiment has been incorperated to capture market reactions that close prices alone may miss (Atkins, 2018).
+Among text sources social media has recieved the majority of research within the industry however, 
+news content has recieved less attention despite its proven potential (Ashtiani, 2023).
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+While traditional machine learining (ML) methods provided a foundation for sentiment analysis, they fall short in more complex domains like finance. 
+These models rely on domain-specific feature enigneering limiting their ability to understand complex or subtle sentiments which are frequnt in finacial news (Bashiri and Naderi, 2024).
+This can also introduce bias into these models, reducing generalisability and their power in unseen datasets.
+Deep learning methods such as RNNs, LSTMs and Transformers offer a more robust alternative stemming from their ability to capture sequential patterns, 
+making them better suited for analysing sentiment in financial news (Bashiri and Naderi, 2024).
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+FinBERT, introduced by Huang, Wang, and Yang (2022), is a domain-specific language model based on BERT but trained on financial documents and news. 
+It significantly outperforms general-purpose models and other ML methods e.g. BERT, Naive Bayes and LSTMs
+in extracting sentiment and insights from financial text, proving that these methods hold value in stock market prediction.
+
+This project compares multiple neural architectures to evaluate which best captures financial sentiment from news, 
+with the aim of identifying patterns that could signal market movement more effectively than traditional data alone.
+
 
 %-------------------------------------------------------%
 \section{Dataset Description}
 % Source of the dataset.
 % Key features, size, and any notable characteristics.
 % Any pre-processing steps applied (cleaning, feature selection, transformations).
-Describe the dataset source, key features, size, and any preprocessing applied. Don't forget to cite the dataset~\cite{foucault2000order} you used accordingly.
+This project uses the English Financial News dataset (Calarte, 2023), which includes roughly 27,000 financial news headlines
+from twitter and yahoo finance, each observation is labelled as positive, negative or neutral. This dataset was selected 
+due to the large corpus of textual data, which will accurately reflect the types of news that will affect financial markets.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+The dataset was split 80/20 into a training and testing set. All text was converted to lower case and then 
+tokenised, words no contained within GloVe where removed to ensure full embedding coverage. A custom vocabulary was then built,
+all sequences were padded or truncated to be of the same length.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+An embedding matrix was then constructed using pre-trained gloVe embeddings to speed up training time, words not contained in
+gloVe were randomly initialised. Processed inputs and labels were formatted as PyTorch tensors and batched.
+While well-suited to sentiment classification, the dataset is slightly imbalanced, with neutral sentiment more frequent.
 
 %-------------------------------------------------------%
 \section{Methods}

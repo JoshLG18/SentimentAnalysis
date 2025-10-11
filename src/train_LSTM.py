@@ -8,42 +8,52 @@ import time
 from preprocessing import prepare_data
 from training_loop import train_model
 from utils import save_metrics_and_history
+from transformers import AutoModel
 
 warnings.filterwarnings('ignore')
 
 set_seed()
 
-train_path = '../data/twitter_training.csv'
-test_path = '../data/twitter_validation.csv'
-train_loader, test_loader, vocab, embedding_matrix = prepare_data(train_path, test_path)
+train_loader, test_loader = prepare_data()
 
 
 #Crearte the LSTM model
 class LSTMSentiment(nn.Module):
-    def __init__(self, vocab_size, embed_dim, hidden_dim, num_layers=2):
+    def __init__(self, hidden_dim, num_layers=2):
         super(LSTMSentiment, self).__init__()
-        self.embedding = nn.Embedding.from_pretrained(embedding_matrix, freeze=False, padding_idx=vocab["<pad>"]) # embedding layer
-        self.lstm = nn.LSTM(embed_dim, hidden_dim, num_layers=num_layers, 
-                            batch_first=True, bidirectional=True) # LSTM layer
-        self.attention = nn.Linear(hidden_dim*2, hidden_dim*2) # Attention layer
-        self.fc = nn.Linear(hidden_dim*2, 4)
-        
-    def forward(self, x):
-        x = self.embedding(x) # run the embedding layer
-        lstm_out, _ = self.lstm(x) # run lstm layer
+        self.bert = AutoModel.from_pretrained("ProsusAI/finbert")
+        for param in self.bert.parameters():
+            param.requires_grad = False  # freeze FinBERT
 
-        att_scores = self.attention(lstm_out) # compute attention scores
-        attn_weights = torch.softmax(att_scores, dim=1) # normalize scores to weights
+        self.lstm = nn.LSTM(input_size=768,  # FinBERT hidden size
+                            hidden_size=hidden_dim,
+                            num_layers=num_layers,
+                            batch_first=True,
+                            bidirectional=True,
+                            dropout=0.3)
 
-        context = torch.sum(attn_weights * lstm_out, dim=1) # weighted sum to get context vector
+        self.attention = nn.Linear(hidden_dim * 2, hidden_dim * 2)
+        self.fc = nn.Linear(hidden_dim * 2, 3)
+
+    def forward(self, input_ids, attention_mask):
+        with torch.no_grad():
+            bert_out = self.bert(input_ids=input_ids, attention_mask=attention_mask)
+        x = bert_out.last_hidden_state  # [batch_size, seq_len, 768]
+
+        lstm_out, _ = self.lstm(x)
+
+        att_scores = self.attention(lstm_out)
+        attn_weights = torch.softmax(att_scores, dim=1)
+        context = torch.sum(attn_weights * lstm_out, dim=1)
 
         out = self.fc(context)
-        return out.squeeze()
+        return out
+
 
 # Initialize model, loss function, and optimizer
-model = LSTMSentiment(len(vocab), EMBEDDING_DIM, HIDDEN_DIM).to(DEVICE)
-criterion = nn.CrossEntropyLoss()
-optimiser = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+model = LSTMSentiment(HIDDEN_DIM).to(DEVICE)
+criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
+optimiser = optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-5)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5)
 
 model_save_loc = '../results/saved_models/LSTM.pt'

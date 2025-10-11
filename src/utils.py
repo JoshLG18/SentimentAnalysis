@@ -10,20 +10,14 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # ========== Hyperparameters ==========
 EMBEDDING_DIM = 300
-HIDDEN_DIM = 512
+HIDDEN_DIM = 256
 BATCH_SIZE = 64
 EPOCHS = 100
 MAX_LEN = 300
 LEARNING_RATE = 1e-3
-LABEL_MAPPING = { # set the label mapping for the dataset
-    "negative": 0,
-    "neutral": 1,
-    "positive": 2,
-    "irrelevant": 3
-}
 
 # ========== Seed Setting ==========
-def set_seed(seed: int = 42):
+def set_seed(seed: int = 123):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
