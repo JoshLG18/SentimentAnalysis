@@ -22,7 +22,13 @@ def prepare_data(test_size=0.2, random_state=42):
     df.columns = ["text", "label"]
 
     # Train/test split
-    train_df, test_df = train_test_split(df, test_size=test_size, random_state=random_state)
+    train_df, test_df = train_test_split(
+        df,
+        test_size=test_size,
+        random_state=random_state,
+        stratify=df["label"]  # ensures balanced label proportions
+        )
+
     train_ds = Dataset.from_pandas(train_df)
     test_ds = Dataset.from_pandas(test_df)
 
