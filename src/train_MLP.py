@@ -42,7 +42,7 @@ class MLP(nn.Module):
 model = MLP(
             hidden_dim=HIDDEN_DIM,
             output_dim=3,
-            )
+            ).to(DEVICE)
 criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
 optimiser = optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-5)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5)

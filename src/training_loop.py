@@ -11,18 +11,22 @@ from tqdm import tqdm
 
 
 # --------------------------------------------------
-# Train one epoch
+# Train one epoch (compatible with HuggingFace FinBERT)
 # --------------------------------------------------
 def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
     model.train()
     total_loss = 0
     loop = tqdm(enumerate(dataloader, start=1), total=len(dataloader), desc="Training")
 
-    for batch_idx, (X, y) in loop:
-        X, y = X.to(device), y.to(device)
+    for batch_idx, batch in loop:
+        input_ids = batch["input_ids"].to(device)
+        attention_mask = batch["attention_mask"].to(device)
+        labels = batch["labels"].to(device)
+
         optimiser.zero_grad()
-        preds = model(X)
-        loss = criterion(preds, y)
+        outputs = model(input_ids=input_ids, attention_mask=attention_mask)
+
+        loss = criterion(outputs, labels)
 
         if torch.isnan(loss) or torch.isinf(loss):
             print(f"⚠️ NaN/Inf loss at batch {batch_idx}, skipping update")
@@ -39,7 +43,7 @@ def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
 
 
 # --------------------------------------------------
-# Improved evaluation (with per-class metrics)
+# Evaluation (compatible with HuggingFace FinBERT)
 # --------------------------------------------------
 def evaluate(model, dataloader, criterion, device, label_names=None, return_preds=False):
     model.eval()
@@ -47,15 +51,18 @@ def evaluate(model, dataloader, criterion, device, label_names=None, return_pred
     all_preds, all_labels = [], []
 
     with torch.no_grad():
-        for X, y in dataloader:
-            X, y = X.to(device), y.to(device)
-            outputs = model(X)
-            loss = criterion(outputs, y)
+        for batch in dataloader:
+            input_ids = batch["input_ids"].to(device)
+            attention_mask = batch["attention_mask"].to(device)
+            labels = batch["labels"].to(device)
+
+            outputs = model(input_ids=input_ids, attention_mask=attention_mask)
+            loss = criterion(outputs, labels)
             total_loss += loss.item()
 
             preds = torch.argmax(outputs, dim=1)
             all_preds.extend(preds.cpu().numpy())
-            all_labels.extend(y.cpu().numpy())
+            all_labels.extend(labels.cpu().numpy())
 
     all_preds = np.array(all_preds)
     all_labels = np.array(all_labels)
