@@ -9,11 +9,9 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # ========== Hyperparameters ==========
-EMBEDDING_DIM = 300
 HIDDEN_DIM = 256
 BATCH_SIZE = 64
 EPOCHS = 100
-MAX_LEN = 300
 LEARNING_RATE = 1e-3
 
 # ========== Seed Setting ==========

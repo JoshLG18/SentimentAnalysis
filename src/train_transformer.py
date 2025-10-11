@@ -50,7 +50,7 @@ class Transformer(nn.Module):
     def forward(self, input_ids, attention_mask):
         with torch.no_grad():
             bert_out = self.bert(input_ids=input_ids, attention_mask=attention_mask)
-        x = bert_out.last_hidden_state  # [batch, seq_len, 768]
+        x = bert_out.last_hidden_state 
 
         x = self.layernorm(x)
 

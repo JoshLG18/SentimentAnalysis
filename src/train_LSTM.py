@@ -1,5 +1,5 @@
-
-from utils import DEVICE, EMBEDDING_DIM, HIDDEN_DIM, BATCH_SIZE, EPOCHS, MAX_LEN, LEARNING_RATE, set_seed
+# load the libraries
+from utils import DEVICE, HIDDEN_DIM, LEARNING_RATE, set_seed
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -12,20 +12,22 @@ from transformers import AutoModel
 
 warnings.filterwarnings('ignore')
 
-set_seed()
+set_seed() # set the seeds
 
-train_loader, test_loader = prepare_data()
+train_loader, test_loader = prepare_data() # prep the data
 
 
 #Crearte the LSTM model
 class LSTMSentiment(nn.Module):
     def __init__(self, hidden_dim, num_layers=2):
         super(LSTMSentiment, self).__init__()
-        self.bert = AutoModel.from_pretrained("ProsusAI/finbert")
+
+        self.bert = AutoModel.from_pretrained("ProsusAI/finbert") # uses finbert for the embedding layer
+
         for param in self.bert.parameters():
             param.requires_grad = False  # freeze FinBERT
 
-        self.lstm = nn.LSTM(input_size=768,  # FinBERT hidden size
+        self.lstm = nn.LSTM(input_size=768,  
                             hidden_size=hidden_dim,
                             num_layers=num_layers,
                             batch_first=True,
@@ -38,7 +40,7 @@ class LSTMSentiment(nn.Module):
     def forward(self, input_ids, attention_mask):
         with torch.no_grad():
             bert_out = self.bert(input_ids=input_ids, attention_mask=attention_mask)
-        x = bert_out.last_hidden_state  # [batch_size, seq_len, 768]
+        x = bert_out.last_hidden_state
 
         lstm_out, _ = self.lstm(x)
 
@@ -52,8 +54,8 @@ class LSTMSentiment(nn.Module):
 
 # Initialize model, loss function, and optimizer
 model = LSTMSentiment(HIDDEN_DIM).to(DEVICE)
-criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
-optimiser = optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-5)
+criterion = nn.CrossEntropyLoss(label_smoothing=0.1) # loss function with label smoothing
+optimiser = optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-5) # optim with l2 regularisation
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5)
 
 model_save_loc = '../results/saved_models/LSTM.pt'
