@@ -5,14 +5,13 @@ from sklearn.metrics import (
     accuracy_score,
     precision_recall_fscore_support,
     classification_report,
+    confusion_matrix,
+    ConfusionMatrixDisplay
 )
 from utils import EPOCHS
 from tqdm import tqdm
 
-
-# --------------------------------------------------
-# Train one epoch (compatible with HuggingFace FinBERT)
-# --------------------------------------------------
+# Train one epoch
 def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
     model.train()
     total_loss = 0
@@ -42,10 +41,10 @@ def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
     return total_loss / len(dataloader)
 
 
-# --------------------------------------------------
-# Evaluation (compatible with HuggingFace FinBERT)
-# --------------------------------------------------
-def evaluate(model, dataloader, criterion, device, label_names=None, return_preds=False):
+# Evaluation
+
+
+def evaluate(model, dataloader, criterion, device, label_names=None, return_preds=False, plot_confusion=False):
     model.eval()
     total_loss = 0.0
     all_preds, all_labels = [], []
@@ -67,20 +66,20 @@ def evaluate(model, dataloader, criterion, device, label_names=None, return_pred
     all_preds = np.array(all_preds)
     all_labels = np.array(all_labels)
 
-    # Weighted and macro averages
+    #  Metrics 
     acc = accuracy_score(all_labels, all_preds)
-    prec_w, rec_w, f1_w, _ = precision_recall_fscore_support(
-        all_labels, all_preds, average="weighted", zero_division=0
-    )
-    prec_m, rec_m, f1_m, _ = precision_recall_fscore_support(
-        all_labels, all_preds, average="macro", zero_division=0
-    )
+    prec_w, rec_w, f1_w, _ = precision_recall_fscore_support(all_labels, all_preds, average="weighted", zero_division=0)
+    prec_m, rec_m, f1_m, _ = precision_recall_fscore_support(all_labels, all_preds, average="macro", zero_division=0)
 
-    # Per-class detailed report
-    report = classification_report(
-        all_labels, all_preds, target_names=label_names, zero_division=0, output_dict=True
-    )
+    report = classification_report(all_labels, all_preds, target_names=label_names, zero_division=0, output_dict=True)
 
+    #  Confusion matrix 
+    cm = confusion_matrix(all_labels, all_preds)
+    if plot_confusion:
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=label_names)
+        disp.plot(cmap='Blues')
+
+    #  Build results dict
     results = {
         "loss": total_loss / len(dataloader),
         "accuracy": acc,
@@ -91,18 +90,16 @@ def evaluate(model, dataloader, criterion, device, label_names=None, return_pred
         "recall_macro": rec_m,
         "f1_macro": f1_m,
         "report": report,
+        "confusion_matrix": cm.tolist(),
     }
 
     if return_preds:
-        results["y_true"] = all_labels
-        results["y_pred"] = all_preds
+        results["y_true"] = all_labels.tolist()
+        results["y_pred"] = all_preds.tolist()
 
     return results
 
-
-# --------------------------------------------------
 # Training loop with early stopping
-# --------------------------------------------------
 def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler,
                 criterion, device, epochs=EPOCHS, patience=3, label_names=None):
 

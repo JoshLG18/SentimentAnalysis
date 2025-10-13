@@ -17,7 +17,7 @@ set_seed()
 train_loader, test_loader = prepare_data()
 
 
-# === Define Transformer Model Using FinBERT ===
+# Define Transformer Model Using FinBERT
 class Transformer(nn.Module):
     def __init__(self, hidden_dim, num_heads=4, num_layers=2, dropout=0.3):
         super(Transformer, self).__init__()
@@ -63,7 +63,7 @@ class Transformer(nn.Module):
         return self.classifier(x)
 
 
-# === Initialise, Train, and Save ===
+# Initialise, Train, and Save
 model = Transformer(hidden_dim=HIDDEN_DIM).to(DEVICE)
 
 criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
