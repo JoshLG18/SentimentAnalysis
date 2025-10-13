@@ -42,8 +42,6 @@ def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
 
 
 # Evaluation
-
-
 def evaluate(model, dataloader, criterion, device, label_names=None, return_preds=False, plot_confusion=False):
     model.eval()
     total_loss = 0.0
