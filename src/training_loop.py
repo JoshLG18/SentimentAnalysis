@@ -9,7 +9,7 @@ from sklearn.metrics import (
 )
 from utils import EPOCHS
 from tqdm import tqdm
-
+from preprocessing import tokenizer
 # Train one epoch
 def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
     model.train() # set the model to training mode
@@ -49,15 +49,13 @@ def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
 
 
 # Evaluation
-def evaluate(model, dataloader, criterion, device, label_names=None):
+def evaluate(model, dataloader, criterion, device, tokenizer):
     model.eval() # set the evaluation mode
     total_loss = 0.0 # initialse the total loss to 0
     all_preds, all_labels = [], [] # create empty lists for the preds and labels
-    examples = {
-            "correct": {},
-            "wrong": {}
-        }
-    
+    test_texts = []
+    test_labels = []  
+
     with torch.no_grad(): 
         for batch in dataloader: # mini-batching
             # set up the input, attention and labels
@@ -74,6 +72,11 @@ def evaluate(model, dataloader, criterion, device, label_names=None):
             preds = torch.argmax(outputs, dim=1)
             all_preds.extend(preds.cpu().numpy()) # add the pred to the list
             all_labels.extend(labels.cpu().numpy()) # add the label to the list
+
+            decoded_texts = tokenizer.batch_decode(input_ids, skip_special_tokens=True)
+            test_texts.extend(decoded_texts)
+            test_labels.extend(labels.cpu().numpy())
+
 
     # convert lists to numpy arrays
     all_preds = np.array(all_preds)
@@ -94,9 +97,28 @@ def evaluate(model, dataloader, criterion, device, label_names=None):
 
     # TO-DO Add in AUC Curves
 
-    #  Build results dict
+    label_names = ["negative", "neutral", "positive"]
+    example_tracker = {"correct": {}, "wrong": {}}
+
+    for text, true, pred in zip(test_texts, test_labels, all_preds):
+        true_name = label_names[true] if true < len(label_names) else str(true)
+        pred_name = label_names[pred] if pred < len(label_names) else str(pred)
+
+        if true == pred and true_name not in example_tracker["correct"]:
+            example_tracker["correct"][true_name] = {
+                "text": text,
+                "true": true_name,
+                "pred": pred_name,
+            }
+        if true != pred and true_name not in example_tracker["wrong"]:
+            example_tracker["wrong"][true_name] = {
+                "text": text,
+                "true": true_name,
+                "pred": pred_name,
+            }
+
+    # Store results
     results = {
-        "loss": total_loss / len(dataloader),
         "accuracy": acc,
         "precision_weighted": prec_w,
         "recall_weighted": rec_w,
@@ -106,13 +128,14 @@ def evaluate(model, dataloader, criterion, device, label_names=None):
         "f1_macro": f1_m,
         "report": report,
         "confusion_matrix": cm.tolist(),
+        "examples": example_tracker
     }
 
     return results
 
 # Training loop with early stopping
 def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler,
-                criterion, device, epochs=EPOCHS, patience=5, label_names=None):
+                criterion, device, epochs=EPOCHS, patience=5):
     
     # set up the history dictionary to store the training metrics
     history = {
@@ -130,7 +153,7 @@ def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler
         train_loss = train_one_epoch(model, train_loader, optimiser, scheduler, criterion, device)
         
         # evaluate the model
-        metrics = evaluate(model, val_loader, criterion, device, label_names)
+        metrics = evaluate(model, val_loader, criterion, device)
 
         # print the metrics - allows tracking training progress
         print(f"[Epoch {epoch+1}/{epochs}] "

@@ -26,7 +26,7 @@ def prepare_data_tfidf(test_size=0.2, random_state=123):
     df = raw_dataset["train"].to_pandas()[["newscontents", "label"]]
     df.columns = ["text", "label"]
 
-    # Train/test split (stratified)
+    # Train/test split
     train_df, test_df = train_test_split(
         df,
         test_size=test_size,
