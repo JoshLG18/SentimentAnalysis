@@ -135,7 +135,7 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
 
 # Training loop with early stopping
 def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler,
-                criterion, device,tokeniser, epochs=EPOCHS, patience=5, ):
+                criterion, device,tokeniser, epochs=EPOCHS, patience=5):
     
     # set up the history dictionary to store the training metrics
     history = {
