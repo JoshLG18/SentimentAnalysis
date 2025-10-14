@@ -1,5 +1,3 @@
-# preprocessing.py
-
 import torch
 from datasets import load_dataset, Dataset
 from sklearn.model_selection import train_test_split
@@ -8,9 +6,9 @@ from torch.utils.data import DataLoader
 from utils import BATCH_SIZE
 
 # Constants
-MODEL_NAME = "ProsusAI/finbert"
+MODEL_NAME = "ProsusAI/finbert" # defines the finbert model used
 
-# Load tokenizer
+# Load tokenizer and collator
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
@@ -24,7 +22,7 @@ def prepare_data(test_size=0.2, random_state=123):
     # Train/test split using stratified sampling - ensures class imbalance is maintained in the splits
     train_df, test_df = train_test_split(
         df,
-        test_size=test_size,
+        test_size=test_size, # defines the test size as 20%
         random_state=random_state, # ensures random splits are reproduceable
         stratify=df["label"]  # ensures balanced label proportions
         )

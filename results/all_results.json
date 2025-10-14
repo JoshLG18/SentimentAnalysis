@@ -502,5 +502,105 @@
                 0.8897142782713516
             ]
         }
+    },
+    "train_LR": {
+        "timestamp": "2025-10-13 20:52:55",
+        "training_time": 8.852597951889038,
+        "best_metrics": {
+            "accuracy": 0.85190642843986,
+            "precision_weighted": 0.8578033657734739,
+            "recall_weighted": 0.85190642843986,
+            "f1_weighted": 0.8539752056331502,
+            "precision_macro": 0.7972549836800183,
+            "recall_macro": 0.8289921333952215,
+            "f1_macro": 0.8115008891874252,
+            "report": {
+                "0": {
+                    "precision": 0.6765083440308087,
+                    "recall": 0.7865671641791044,
+                    "f1-score": 0.7273982056590752,
+                    "support": 670.0
+                },
+                "1": {
+                    "precision": 0.9180834621329211,
+                    "recall": 0.8758478324977883,
+                    "f1-score": 0.896468457591307,
+                    "support": 3391.0
+                },
+                "2": {
+                    "precision": 0.7971731448763251,
+                    "recall": 0.8245614035087719,
+                    "f1-score": 0.8106360043118936,
+                    "support": 1368.0
+                },
+                "accuracy": 0.85190642843986,
+                "macro avg": {
+                    "precision": 0.7972549836800183,
+                    "recall": 0.8289921333952215,
+                    "f1-score": 0.8115008891874252,
+                    "support": 5429.0
+                },
+                "weighted avg": {
+                    "precision": 0.8578033657734739,
+                    "recall": 0.85190642843986,
+                    "f1-score": 0.8539752056331502,
+                    "support": 5429.0
+                }
+            },
+            "confusion_matrix": [
+                [
+                    527,
+                    96,
+                    47
+                ],
+                [
+                    181,
+                    2970,
+                    240
+                ],
+                [
+                    71,
+                    169,
+                    1128
+                ]
+            ],
+            "examples": {
+                "correct": {
+                    "neutral": {
+                        "text": "Nike sets strategy in South America",
+                        "true": "neutral",
+                        "pred": "neutral"
+                    },
+                    "positive": {
+                        "text": "Ramirent is a leading company in machinery and equipment rentals for construction and industry .",
+                        "true": "positive",
+                        "pred": "positive"
+                    },
+                    "negative": {
+                        "text": "Finnish technology company Raute Corporation ( OMX Helsinki : RUTAV ) issued on Tuesday ( 23 September ) a profit warning for the financial year 2008 .",
+                        "true": "negative",
+                        "pred": "negative"
+                    }
+                },
+                "wrong": {
+                    "neutral": {
+                        "text": "2020: the year investors fall in love with stocks again?",
+                        "true": "neutral",
+                        "pred": "negative"
+                    },
+                    "positive": {
+                        "text": "The expansion includes the doubling of the floor space and the addition of more lifting capacity and production equipment .",
+                        "true": "positive",
+                        "pred": "neutral"
+                    },
+                    "negative": {
+                        "text": "$BXC (-3.5% pre) Form S-3 BlueLinx Holdings Inc. https://t.co/3hpRHqTF4a",
+                        "true": "negative",
+                        "pred": "positive"
+                    }
+                }
+            }
+        },
+        "history": null
     }
 }

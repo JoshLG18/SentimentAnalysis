@@ -4,17 +4,17 @@ import numpy as np
 import os, sys, json
 from datetime import datetime
 
-# ========== Device ==========
+#  Device 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-# ========== Hyperparameters ==========
+#  Hyperparameters 
 HIDDEN_DIM = 256
 BATCH_SIZE = 64
 EPOCHS = 100
 LEARNING_RATE = 1e-4
 
-# ========== Seed Setting ==========
+# Set the seed
 def set_seed(seed: int = 123):
     random.seed(seed)
     np.random.seed(seed)
@@ -23,12 +23,13 @@ def set_seed(seed: int = 123):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
+# save all the metrics to the right file
 def save_metrics_and_history(best_metrics, history,training_time):
     # Create results folder if it doesn't exist
     os.makedirs("results", exist_ok=True)
 
     # File to store all results together
-    results_file = "../results/all_results.json"
+    results_file = "./results/all_results.json"
 
     # Get current script filename (e.g. train_LSTM.py or train_MLP.py)
     script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]

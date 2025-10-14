@@ -16,8 +16,7 @@ set_seed()
 # Load processed data
 train_loader, test_loader = prepare_data()
 
-
-# Define Transformer Model Using FinBERT
+# Define Transformer Model Using FinBERT - TO-DO increase the power of this model.
 class Transformer(nn.Module):
     def __init__(self, hidden_dim, num_heads=4, num_layers=2, dropout=0.3):
         super(Transformer, self).__init__()
@@ -27,9 +26,9 @@ class Transformer(nn.Module):
 
         embed_dim = 768  # FinBERT output dimension
 
-        self.layernorm = nn.LayerNorm(embed_dim)
+        self.layernorm = nn.LayerNorm(embed_dim) # define the normalisation layer
 
-        encoder_layer = nn.TransformerEncoderLayer(
+        encoder_layer = nn.TransformerEncoderLayer( # define the transformer encoder
             d_model=embed_dim,
             nhead=num_heads,
             dim_feedforward=hidden_dim,
@@ -38,8 +37,10 @@ class Transformer(nn.Module):
             batch_first=True
         )
 
+        # create the transformer encoder
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
 
+        # use a simple 2 layer FCL to output the logits
         self.classifier = nn.Sequential(
             nn.Linear(embed_dim, hidden_dim),
             nn.ReLU(),
@@ -48,32 +49,32 @@ class Transformer(nn.Module):
         )
 
     def forward(self, input_ids, attention_mask):
+        # get the embeddings from finbert
         with torch.no_grad():
             bert_out = self.bert(input_ids=input_ids, attention_mask=attention_mask)
         x = bert_out.last_hidden_state 
 
-        x = self.layernorm(x)
+        x = self.layernorm(x) # add a normalisation layer
 
-        # Invert attention_mask: Transformer expects True for padding tokens
         src_key_padding_mask = ~attention_mask.bool()
         x = self.transformer_encoder(x, src_key_padding_mask=src_key_padding_mask)
 
         x = x.mean(dim=1)  # Global average pooling
 
-        return self.classifier(x)
+        return self.classifier(x) # run the classifier to get the output and return it
 
 
-# Initialise, Train, and Save
+# Initialise the model, loss function, optimiser and scheduler
 model = Transformer(hidden_dim=HIDDEN_DIM).to(DEVICE)
 
-criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
-optimiser = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-4)
-scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5)
+criterion = nn.CrossEntropyLoss(label_smoothing=0.1) # implement label smoothing
+optimiser = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-4) # L2 reg
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5) # decrease LR on plateau
 
 model_save_loc = '../results/saved_models/transformer.pt'
 
-start_time = time.time()
-history, best_metrics = train_model(
+start_time = time.time() # get the time before training
+history, best_metrics = train_model( # train the model
     model_save_loc,
     model,
     train_loader,
@@ -83,7 +84,8 @@ history, best_metrics = train_model(
     criterion,
     DEVICE
 )
-end_time = time.time()
-training_time = end_time - start_time
+end_time = time.time() # get the time at the end of training
+training_time = end_time - start_time # work out how long the model was training for
 
+# save the metrics and history
 save_metrics_and_history(best_metrics, history, training_time)

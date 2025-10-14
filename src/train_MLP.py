@@ -25,11 +25,12 @@ class MLP(nn.Module):
         for param in self.bert.parameters():
             param.requires_grad = False
 
-        # Two hidden layers
+        # Layer 1
         self.fc1 = nn.Linear(768, hidden_dim)
         self.relu1 = nn.ReLU()
         self.dropout1 = nn.Dropout(0.3)
 
+        # Layer 2
         self.fc2 = nn.Linear(hidden_dim, hidden_dim // 2)
         self.relu2 = nn.ReLU()
         self.dropout2 = nn.Dropout(0.3)
@@ -54,7 +55,7 @@ class MLP(nn.Module):
         out = self.relu2(out)
         out = self.dropout2(out)
 
-        out = self.fc3(out)  # raw logits
+        out = self.fc3(out)  # output raw logits
         return out
     
 # Initialize model, loss function, and optimiser
@@ -62,18 +63,20 @@ model = MLP(
             hidden_dim=HIDDEN_DIM,
             output_dim=3,
             ).to(DEVICE)
-criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
-optimiser = optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-5)
-scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5)
+criterion = nn.CrossEntropyLoss(label_smoothing=0.1) # Label smoothing
+optimiser = optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-5) # L2 Regularisation
+# use reduce LR on plateau
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5) 
 
-model_save_loc = '../results/saved_models/mlp.pt'
+model_save_loc = '../results/saved_models/mlp.pt' # set the location to save the model
 
-start_time = time.time() 
+start_time = time.time() # get the time the training starts
 # train the model
 history, best_metrics = train_model(model_save_loc, model, train_loader, test_loader, optimiser,scheduler, criterion, DEVICE)
 
-end_time = time.time()
+end_time = time.time() # get the time the training ends
 
-training_time = end_time - start_time
+training_time = end_time - start_time # work out how long the model is training for
+
 # save the metrics and history of the best model
 save_metrics_and_history(best_metrics, history, training_time)

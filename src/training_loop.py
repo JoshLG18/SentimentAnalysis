@@ -1,81 +1,98 @@
-# training_loop.py
+# import the libraries
 import torch
 import numpy as np
 from sklearn.metrics import (
     accuracy_score,
     precision_recall_fscore_support,
     classification_report,
-    confusion_matrix,
-    ConfusionMatrixDisplay
+    confusion_matrix
 )
 from utils import EPOCHS
 from tqdm import tqdm
 
 # Train one epoch
 def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
-    model.train()
-    total_loss = 0
+    model.train() # set the model to training mode
+    total_loss = 0 # initiatlise total loss to 0
+
+    # set up the loop for visual progress bar
     loop = tqdm(enumerate(dataloader, start=1), total=len(dataloader), desc="Training")
 
-    for batch_idx, batch in loop:
-        input_ids = batch["input_ids"].to(device)
+    for batch_idx, batch in loop: # set up the loop for mini-batching
+        # inidialise the input data, attention amsk and labels
+        input_ids = batch["input_ids"].to(device) 
         attention_mask = batch["attention_mask"].to(device)
         labels = batch["labels"].to(device)
 
-        optimiser.zero_grad()
-        outputs = model(input_ids=input_ids, attention_mask=attention_mask)
+        optimiser.zero_grad() # set the gradients of the optimsier back to 0
 
-        loss = criterion(outputs, labels)
+        # compute the outputs of the prediction
+        outputs = model(input_ids=input_ids, attention_mask=attention_mask) 
+
+        loss = criterion(outputs, labels) # compute loss
 
         if torch.isnan(loss) or torch.isinf(loss):
             print(f"⚠️ NaN/Inf loss at batch {batch_idx}, skipping update")
             continue
 
-        loss.backward()
+        loss.backward() # backpropagation - compute the gradients
+
+        # gradient clipping
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
-        optimiser.step()
+        optimiser.step() # update the weights
+        #add the loss from this batch
         total_loss += loss.item()
 
-        loop.set_postfix(loss=loss.item())
+        loop.set_postfix(loss=loss.item()) # add the current loss to the end of the progress bar
 
-    return total_loss / len(dataloader)
+    return total_loss / len(dataloader) # return total loss / number of batches
 
 
 # Evaluation
-def evaluate(model, dataloader, criterion, device, label_names=None, return_preds=False, plot_confusion=False):
-    model.eval()
-    total_loss = 0.0
-    all_preds, all_labels = [], []
-
-    with torch.no_grad():
-        for batch in dataloader:
+def evaluate(model, dataloader, criterion, device, label_names=None):
+    model.eval() # set the evaluation mode
+    total_loss = 0.0 # initialse the total loss to 0
+    all_preds, all_labels = [], [] # create empty lists for the preds and labels
+    examples = {
+            "correct": {},
+            "wrong": {}
+        }
+    
+    with torch.no_grad(): 
+        for batch in dataloader: # mini-batching
+            # set up the input, attention and labels
             input_ids = batch["input_ids"].to(device)
             attention_mask = batch["attention_mask"].to(device)
             labels = batch["labels"].to(device)
 
+            # compute the output, loss and increment the total loss
             outputs = model(input_ids=input_ids, attention_mask=attention_mask)
             loss = criterion(outputs, labels)
             total_loss += loss.item()
 
+            # prediction chooses the largest of the output logits
             preds = torch.argmax(outputs, dim=1)
-            all_preds.extend(preds.cpu().numpy())
-            all_labels.extend(labels.cpu().numpy())
+            all_preds.extend(preds.cpu().numpy()) # add the pred to the list
+            all_labels.extend(labels.cpu().numpy()) # add the label to the list
 
+    # convert lists to numpy arrays
     all_preds = np.array(all_preds)
     all_labels = np.array(all_labels)
 
-    #  Metrics 
-    acc = accuracy_score(all_labels, all_preds)
+    # Compute the Metrics 
+    acc = accuracy_score(all_labels, all_preds) # accuracy
+
+    # precision, recall and f1; weighted and overall/macro
     prec_w, rec_w, f1_w, _ = precision_recall_fscore_support(all_labels, all_preds, average="weighted", zero_division=0)
     prec_m, rec_m, f1_m, _ = precision_recall_fscore_support(all_labels, all_preds, average="macro", zero_division=0)
 
+    # create the classification report which gives the metrics for each class
     report = classification_report(all_labels, all_preds, target_names=label_names, zero_division=0, output_dict=True)
 
-    #  Confusion matrix 
+    #  create the confusion matrix
     cm = confusion_matrix(all_labels, all_preds)
-    if plot_confusion:
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=label_names)
-        disp.plot(cmap='Blues')
+
+    # TO-DO Add in AUC Curves
 
     #  Build results dict
     results = {
@@ -91,29 +108,31 @@ def evaluate(model, dataloader, criterion, device, label_names=None, return_pred
         "confusion_matrix": cm.tolist(),
     }
 
-    if return_preds:
-        results["y_true"] = all_labels.tolist()
-        results["y_pred"] = all_preds.tolist()
-
     return results
 
 # Training loop with early stopping
 def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler,
-                criterion, device, epochs=EPOCHS, patience=3, label_names=None):
-
+                criterion, device, epochs=EPOCHS, patience=5, label_names=None):
+    
+    # set up the history dictionary to store the training metrics
     history = {
         "train_loss": [], "val_loss": [],
         "accuracy": [], "precision_weighted": [], "recall_weighted": [], "f1_weighted": []
     }
 
-    best_val_loss = float("inf")
-    patience_counter = 0
-    best_metrics = None
+    best_val_loss = float("inf") # initialse best val loss
+    patience_counter = 0 # initialise patience tracker
+    best_metrics = None # initalise best metrics to 0
 
-    for epoch in range(epochs):
+    for epoch in range(epochs): # loops through the number of epochs
+
+        # train the model
         train_loss = train_one_epoch(model, train_loader, optimiser, scheduler, criterion, device)
+        
+        # evaluate the model
         metrics = evaluate(model, val_loader, criterion, device, label_names)
 
+        # print the metrics - allows tracking training progress
         print(f"[Epoch {epoch+1}/{epochs}] "
               f"Train Loss: {train_loss:.4f} | "
               f"Val Loss: {metrics['loss']:.4f} | "
@@ -128,7 +147,10 @@ def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler
         history["recall_weighted"].append(metrics["recall_weighted"])
         history["f1_weighted"].append(metrics["f1_weighted"])
 
-        # Save best model
+        # monitor loss and take a step if needed
+        scheduler.step(metrics['loss'])
+
+        # Save best model and track patience
         if metrics["loss"] < best_val_loss:
             best_val_loss = metrics["loss"]
             best_metrics = metrics.copy()
@@ -137,10 +159,10 @@ def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler
             patience_counter = 0
             print(f"✅ New best model saved at epoch {epoch+1} with val_loss={best_val_loss:.4f}")
         else:
-            patience_counter += 1
-            if patience_counter >= patience:
+            patience_counter += 1 # if the better model isn't found increaase patience counter
+            if patience_counter >= patience: # if patients is reached early stop
                 print("⏹ Early stopping triggered")
                 break
 
-    model.load_state_dict(torch.load(save_path))
-    return history, best_metrics
+    model.load_state_dict(torch.load(save_path)) # save the best model
+    return history, best_metrics # return the history and the best metrics
