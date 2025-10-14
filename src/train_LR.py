@@ -41,7 +41,7 @@ def prepare_data_tfidf(test_size=0.2, random_state=123):
 
 
 # Train and evaluate model
-def train_baseline_tfidf_lr(save_path="./results/saved_models/tfidf_lr.pkl"):
+def train_baseline_tfidf_lr(save_path="../results/saved_models/tfidf_lr.pkl"):
     print("Preparing data...")
     train_texts, train_labels, test_texts, test_labels = prepare_data_tfidf()
 

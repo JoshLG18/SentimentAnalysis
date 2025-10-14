@@ -9,6 +9,7 @@ from preprocessing import prepare_data
 from training_loop import train_model
 from utils import save_metrics_and_history
 from transformers import AutoModel
+from preprocessing import tokenizer
 
 warnings.filterwarnings('ignore')
 
@@ -62,7 +63,7 @@ model_save_loc = '../results/saved_models/LSTM.pt' # set where we want to save t
 
 start_time = time.time() # get the time the training starts
 # train the model
-history, best_metrics = train_model(model_save_loc, model, train_loader, test_loader, optimiser,scheduler, criterion, DEVICE)
+history, best_metrics = train_model(model_save_loc, model, train_loader, test_loader, optimiser,scheduler, criterion, DEVICE, tokenizer)
 
 end_time = time.time() # get the time the training ends
 

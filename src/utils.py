@@ -29,7 +29,7 @@ def save_metrics_and_history(best_metrics, history,training_time):
     os.makedirs("results", exist_ok=True)
 
     # File to store all results together
-    results_file = "./results/all_results.json"
+    results_file = "../results/all_results.json"
 
     # Get current script filename (e.g. train_LSTM.py or train_MLP.py)
     script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]

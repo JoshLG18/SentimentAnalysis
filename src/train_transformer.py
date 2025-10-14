@@ -9,6 +9,7 @@ from training_loop import train_model
 from preprocessing import prepare_data
 from utils import save_metrics_and_history
 from transformers import AutoModel
+from preprocessing import tokenizer
 
 warnings.filterwarnings('ignore')
 set_seed()
@@ -82,7 +83,8 @@ history, best_metrics = train_model( # train the model
     optimiser,
     scheduler,
     criterion,
-    DEVICE
+    DEVICE,
+    tokenizer
 )
 end_time = time.time() # get the time at the end of training
 training_time = end_time - start_time # work out how long the model was training for

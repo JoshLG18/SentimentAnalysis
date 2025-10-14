@@ -10,6 +10,7 @@ from preprocessing import prepare_data
 from utils import save_metrics_and_history
 warnings.filterwarnings('ignore')
 from transformers import AutoModel
+from preprocessing import tokenizer
 
 set_seed() # sets the seed
 
@@ -72,7 +73,7 @@ model_save_loc = '../results/saved_models/mlp.pt' # set the location to save the
 
 start_time = time.time() # get the time the training starts
 # train the model
-history, best_metrics = train_model(model_save_loc, model, train_loader, test_loader, optimiser,scheduler, criterion, DEVICE)
+history, best_metrics = train_model(model_save_loc, model, train_loader, test_loader, optimiser,scheduler, criterion, DEVICE, tokenizer)
 
 end_time = time.time() # get the time the training ends
 

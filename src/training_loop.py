@@ -9,7 +9,7 @@ from sklearn.metrics import (
 )
 from utils import EPOCHS
 from tqdm import tqdm
-from preprocessing import tokenizer
+
 # Train one epoch
 def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
     model.train() # set the model to training mode
@@ -135,7 +135,7 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
 
 # Training loop with early stopping
 def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler,
-                criterion, device, epochs=EPOCHS, patience=5):
+                criterion, device,tokeniser, epochs=EPOCHS, patience=5, ):
     
     # set up the history dictionary to store the training metrics
     history = {
@@ -153,7 +153,7 @@ def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler
         train_loss = train_one_epoch(model, train_loader, optimiser, scheduler, criterion, device)
         
         # evaluate the model
-        metrics = evaluate(model, val_loader, criterion, device)
+        metrics = evaluate(model, val_loader, criterion, device, tokeniser)
 
         # print the metrics - allows tracking training progress
         print(f"[Epoch {epoch+1}/{epochs}] "
