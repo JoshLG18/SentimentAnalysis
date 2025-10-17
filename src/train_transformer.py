@@ -15,7 +15,7 @@ warnings.filterwarnings('ignore')
 set_seed()
 
 # Load processed data
-train_loader, test_loader = prepare_data()
+train_loader, test_loader, class_weights = prepare_data()
 
 # Define Transformer Model Using FinBERT
 class Transformer(nn.Module):
@@ -79,7 +79,7 @@ class Transformer(nn.Module):
 # Initialise the model, loss function, optimiser and scheduler
 model = Transformer(hidden_dim=HIDDEN_DIM).to(DEVICE)
 
-criterion = nn.CrossEntropyLoss(label_smoothing=0.1) # implement label smoothing
+criterion = nn.CrossEntropyLoss(label_smoothing=0.1, weight=class_weights) # Label smoothing to improve regularisation / decrease overfitting
 optimiser = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-4) # L2 reg
 # if the loss hasnt improved after 2 epochs reduce lr by 50%
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5) # decrease LR on plateau

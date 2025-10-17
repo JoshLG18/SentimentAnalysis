@@ -36,7 +36,6 @@ def prepare_data_tfidf(test_size=0.2, random_state=123):
 
     df["text"] = df["text"].apply(clean_text) # cleans all the text
 
-
     # Train/test split - stratified to maintain label distribution
     train_df, test_df = train_test_split(
         df,

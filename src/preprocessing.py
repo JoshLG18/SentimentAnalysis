@@ -5,6 +5,9 @@ from transformers import AutoTokenizer, DataCollatorWithPadding
 from torch.utils.data import DataLoader
 from utils import BATCH_SIZE
 import re
+import numpy as np
+from sklearn.utils.class_weight import compute_class_weight
+from utils import DEVICE
 
 # Constants
 MODEL_NAME = "ProsusAI/finbert" # defines the finbert model used
@@ -30,7 +33,6 @@ def prepare_data(test_size=0.2, random_state=123):
     df.columns = ["text", "label"]
 
     df["text"] = df["text"].apply(clean_text) # cleans all the text
-
 
     # Train/test split using stratified sampling - ensures class imbalance is maintained in the splits
     train_df, test_df = train_test_split(
@@ -58,4 +60,14 @@ def prepare_data(test_size=0.2, random_state=123):
     train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, collate_fn=data_collator)
     test_loader = DataLoader(test_ds, batch_size=BATCH_SIZE, shuffle=False, collate_fn=data_collator)
 
-    return train_loader, test_loader # returns the loaders to be used in the training scripts
+    # Compute class weights to handle class imbalance
+    labels = train_df["label"].values # extract all training labels - will represent entire dist beacuse of stratified sampling
+    classes = np.unique(labels) # finds the number of unique classes
+
+    # computes the weights of each class
+    class_weights = compute_class_weight(class_weight="balanced", classes=classes, y=labels)
+
+    # convert the class weights to a tensor so the models can understand
+    class_weights = torch.tensor(class_weights, dtype=torch.float).to(DEVICE)
+
+    return train_loader, test_loader, class_weights # returns the loaders to be used in the training scripts
