@@ -14,10 +14,18 @@ from sklearn.metrics import (
 )
 from datasets import load_dataset
 from sklearn.model_selection import train_test_split
-import pandas as pd
+import re
 
 warnings.filterwarnings("ignore")
 set_seed()
+
+def clean_text(text):
+    text = re.sub(r"http\S+|www\S+|https\S+", "", text)   # remove URLs
+    text = re.sub(r"\(.*?\)", "", text)                   # remove parenthetical phrases (e.g., stock tickers)
+    text = re.sub(r"[^a-zA-Z0-9.,!?'\s]", "", text)       # remove weird symbols
+    text = re.sub(r"\s+", " ", text)                      # collapse extra whitespace
+    text = text.strip()                                   # remove leading/trailing spaces
+    return text
 
 # Prepare data
 def prepare_data_tfidf(test_size=0.2, random_state=123):
@@ -25,6 +33,9 @@ def prepare_data_tfidf(test_size=0.2, random_state=123):
     raw_dataset = load_dataset("lukecarlate/english_finance_news")
     df = raw_dataset["train"].to_pandas()[["newscontents", "label"]]
     df.columns = ["text", "label"]
+
+    df["text"] = df["text"].apply(clean_text) # cleans all the text
+
 
     # Train/test split - stratified to maintain label distribution
     train_df, test_df = train_test_split(
