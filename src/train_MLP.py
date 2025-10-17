@@ -20,7 +20,7 @@ train_loader, test_loader = prepare_data() # prepares all the data
 class MLP(nn.Module):
     def __init__(self, hidden_dim, output_dim=3): # define the output dim to 3 as there are 3 classes
         super(MLP, self).__init__()
-        self.bert = AutoModel.from_pretrained("ProsusAI/finbert")  # FinBERT as embedding layer
+        self.bert = AutoModel.from_pretrained("ProsusAI/finbert")  # load finbert to be the embedding layer
 
         # Freeze all FinBERT parameters for trianing efficiency - would train for so long otherwise
         for param in self.bert.parameters(): # loops through all parameters in the bert model
@@ -75,7 +75,7 @@ model = MLP(
             ).to(DEVICE)
 criterion = nn.CrossEntropyLoss(label_smoothing=0.1) # Label smoothing to improve regularisation / decrease overfitting
 optimiser = optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-5) # L2 Regularisation
-# use reduce LR on plateau
+# if the loss hasnt improved after 2 epochs reduce lr by 50%
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5) 
 
 model_save_loc = '../results/saved_models/mlp.pt' # set the location to save the model

@@ -9,8 +9,8 @@ from utils import BATCH_SIZE
 MODEL_NAME = "ProsusAI/finbert" # defines the finbert model used
 
 # Load tokenizer and collator
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME) # load the tokenizer from finbert
+data_collator = DataCollatorWithPadding(tokenizer=tokenizer) # load the colaltor from finbert
 
 # Load and process dataset
 def prepare_data(test_size=0.2, random_state=123):

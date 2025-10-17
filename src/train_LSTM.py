@@ -78,13 +78,14 @@ class LSTMSentiment(nn.Module):
 
         # Apply dropout for regularisation and pass through final classifier
         out = self.fc(self.dropout(context))
-        
+
         return out # outputs logits for 3 sentiment classes
 
 # Initialize model, loss function, and optimizer
 model = LSTMSentiment(HIDDEN_DIM).to(DEVICE)
 criterion = nn.CrossEntropyLoss(label_smoothing=0.1) # loss function with label smoothing
 optimiser = optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-5) # optim with l2 regularisation
+# if the loss hasnt improved after 2 epochs reduce lr by 50%
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5)
 
 model_save_loc = '../results/saved_models/LSTM.pt' # set where we want to save the model

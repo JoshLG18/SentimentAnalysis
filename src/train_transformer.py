@@ -59,7 +59,7 @@ class Transformer(nn.Module):
         with torch.no_grad():
             bert_out = self.bert(input_ids=input_ids, attention_mask=attention_mask)
 
-        x = bert_out.last_hidden_state 
+        x = bert_out.last_hidden_state # get the output of finbert
 
         x = self.layernorm(x) # add a normalisation layer for finbert encodings - stop exploding gradients
 
@@ -81,6 +81,7 @@ model = Transformer(hidden_dim=HIDDEN_DIM).to(DEVICE)
 
 criterion = nn.CrossEntropyLoss(label_smoothing=0.1) # implement label smoothing
 optimiser = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-4) # L2 reg
+# if the loss hasnt improved after 2 epochs reduce lr by 50%
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5) # decrease LR on plateau
 
 model_save_loc = '../results/saved_models/transformer.pt'
