@@ -191,8 +191,10 @@ def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler
             best_val_loss = metrics["loss"] # this epochs loss becomes the best val loss
             best_metrics = metrics.copy() # copy all of the metrics into a best metric dict
             best_metrics["train_loss"] = train_loss # set the best metric to this epochs train loss
+
             torch.save(model.state_dict(), save_path) # save the models current stae
             patience_counter = 0 # reset the patience counter to 0
+            
             print(f"New best model saved at epoch {epoch+1} with val_loss={best_val_loss:.4f}")
         else:
             patience_counter += 1 # if the better model isn't found increaase patience counter

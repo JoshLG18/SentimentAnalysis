@@ -8,7 +8,7 @@ import time
 from training_loop import train_model
 from preprocessing import prepare_data
 from utils import save_metrics_and_history
-warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore') # turn off warnings so i don't lose my mind
 from transformers import AutoModel
 from preprocessing import tokenizer
 
