@@ -60,14 +60,5 @@ def prepare_data(test_size=0.2, random_state=123):
     train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, collate_fn=data_collator)
     test_loader = DataLoader(test_ds, batch_size=BATCH_SIZE, shuffle=False, collate_fn=data_collator)
 
-    # Compute class weights to handle class imbalance
-    labels = train_df["label"].values # extract all training labels - will represent entire dist beacuse of stratified sampling
-    classes = np.unique(labels) # finds the number of unique classes
 
-    # computes the weights of each class
-    class_weights = compute_class_weight(class_weight="balanced", classes=classes, y=labels)
-
-    # convert the class weights to a tensor so the models can understand
-    class_weights = torch.tensor(class_weights, dtype=torch.float).to(DEVICE)
-
-    return train_loader, test_loader, class_weights # returns the loaders to be used in the training scripts
+    return train_loader, test_loader # returns the loaders to be used in the training scripts

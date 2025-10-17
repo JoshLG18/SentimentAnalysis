@@ -15,7 +15,7 @@ warnings.filterwarnings('ignore')
 
 set_seed() # set the seeds
 
-train_loader, test_loader, class_weights = prepare_data() # prep the data
+train_loader, test_loader = prepare_data() # prep the data
 
 
 #Crearte the LSTM model
@@ -83,7 +83,7 @@ class LSTMSentiment(nn.Module):
 
 # Initialize model, loss function, and optimizer
 model = LSTMSentiment(HIDDEN_DIM).to(DEVICE)
-criterion = nn.CrossEntropyLoss(label_smoothing=0.1, weight=class_weights) # Label smoothing to improve regularisation / decrease overfitting
+criterion = nn.CrossEntropyLoss(label_smoothing=0.1) # Label smoothing to improve regularisation / decrease overfitting
 optimiser = optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-5) # optim with l2 regularisation
 # if the loss hasnt improved after 2 epochs reduce lr by 50%
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5)
