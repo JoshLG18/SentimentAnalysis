@@ -21,45 +21,47 @@ set_seed()
 
 # Prepare data
 def prepare_data_tfidf(test_size=0.2, random_state=123):
-    # Load raw dataset (same as your FinBERT setup)
+    # Load raw dataset
     raw_dataset = load_dataset("lukecarlate/english_finance_news")
     df = raw_dataset["train"].to_pandas()[["newscontents", "label"]]
     df.columns = ["text", "label"]
 
-    # Train/test split
+    # Train/test split - stratified to maintain label distribution
     train_df, test_df = train_test_split(
         df,
         test_size=test_size,
         random_state=random_state,
         stratify=df["label"]
     )
-
+    
+    # collect all the train and test texts and labels
     train_texts, test_texts = train_df["text"].tolist(), test_df["text"].tolist()
     train_labels, test_labels = train_df["label"].tolist(), test_df["label"].tolist()
 
-    return train_texts, train_labels, test_texts, test_labels
+    return train_texts, train_labels, test_texts, test_labels # return the test and train texts and labels
 
 
 # Train and evaluate model
 def train_baseline_tfidf_lr(save_path="../results/saved_models/tfidf_lr.pkl"):
     print("Preparing data...")
-    train_texts, train_labels, test_texts, test_labels = prepare_data_tfidf()
+    train_texts, train_labels, test_texts, test_labels = prepare_data_tfidf() # prep the data - loading and splitting
 
     # Define TF-IDF + Logistic Regression pipeline
     print("Initialising TF-IDF + Logistic Regression...")
-    vectorizer = TfidfVectorizer(ngram_range=(1, 2), stop_words="english")
-    model = LogisticRegression(class_weight='balanced')
+    vectorizer = TfidfVectorizer(ngram_range=(1, 2), stop_words="english") # define the vectorizer
+    model = LogisticRegression(class_weight='balanced') # define the lr model with class weights to take into accound class imbalance
 
     # Train model
     print("Training baseline model...")
-    start_time = time.time()
-    X_train = vectorizer.fit_transform(train_texts)
-    X_test = vectorizer.transform(test_texts)
-    model.fit(X_train, train_labels)
-    training_time = time.time() - start_time
-    print(f"✅ Training complete in {training_time:.2f} seconds.")
+    X_train = vectorizer.fit_transform(train_texts) # vectorise the train texts
+    X_test = vectorizer.transform(test_texts) # vectorise the test texts
 
-    # Predictions
+    start_time = time.time() # take the time before the training begins
+    model.fit(X_train, train_labels) # fit the model
+    training_time = time.time() - start_time # work out how long the model was training for
+    print(f"Training complete in {training_time:.2f} seconds.") # print out how long the model was training for
+
+    # make predictions
     preds = model.predict(X_test)
 
     # Metrics and examples
@@ -72,25 +74,25 @@ def train_baseline_tfidf_lr(save_path="../results/saved_models/tfidf_lr.pkl"):
     label_names = ["negative", "neutral", "positive"]
     example_tracker = {"correct": {}, "wrong": {}}
 
-    for text, true, pred in zip(test_texts, test_labels, preds):
-        true_name = label_names[true] if true < len(label_names) else str(true)
-        pred_name = label_names[pred] if pred < len(label_names) else str(pred)
+    for text, true, pred in zip(test_texts, test_labels, preds):  # loop through each pair of test text, label and prediction
+        true_name = label_names[true] if true < len(label_names) else str(true) # converts integer labels into the word labels
+        pred_name = label_names[pred] if pred < len(label_names) else str(pred) # converts integer labels into the word labels
 
-        if true == pred and true_name not in example_tracker["correct"]:
-            example_tracker["correct"][true_name] = {
+        if true == pred and true_name not in example_tracker["correct"]: # if the true is equal to the prediction
+            example_tracker["correct"][true_name] = { # add that label to the correct example tracker
                 "text": text,
                 "true": true_name,
                 "pred": pred_name,
             }
-        if true != pred and true_name not in example_tracker["wrong"]:
-            example_tracker["wrong"][true_name] = {
+        if true != pred and true_name not in example_tracker["wrong"]: # if the prediction is not equal to the true
+            example_tracker["wrong"][true_name] = {  # add that label to the wrong example tracker
                 "text": text,
                 "true": true_name,
                 "pred": pred_name,
             }
 
     # Store results
-    best_metrics = {
+    results = { # create a dictionary to return the results
         "accuracy": acc,
         "precision_weighted": prec_w,
         "recall_weighted": rec_w,
@@ -104,18 +106,18 @@ def train_baseline_tfidf_lr(save_path="../results/saved_models/tfidf_lr.pkl"):
     }
 
     # Save model and vectorizer
-    joblib.dump({"model": model, "vectorizer": vectorizer}, save_path)
-    print(f"💾 Model saved to {save_path}")
+    joblib.dump({"model": model, "vectorizer": vectorizer}, save_path) # save the model and the vectorisers
+    print(f"Model saved to {save_path}")
 
     # Save metrics using your project utility
-    save_metrics_and_history(best_metrics, history=None, training_time=training_time)
+    save_metrics_and_history(results, history=None, training_time=training_time) # save the model and results in the .json
 
-    print("✅ Baseline complete.")
+    print("Baseline complete.")
     print(f"Accuracy: {acc:.4f} | F1_w: {f1_w:.4f} | F1_m: {f1_m:.4f}")
 
-    return best_metrics
+    return results # return the results
 
 
-# Run baseline
+# Run baseline model when script is run
 if __name__ == "__main__":
     train_baseline_tfidf_lr()

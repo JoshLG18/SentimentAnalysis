@@ -4,17 +4,17 @@ import numpy as np
 import os, sys, json
 from datetime import datetime
 
-#  Device 
+# set the training device 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-#  Hyperparameters 
+# set the hyperparameters 
 HIDDEN_DIM = 256
 BATCH_SIZE = 64
 EPOCHS = 100
 LEARNING_RATE = 1e-4
 
-# Set the seed
+# Set the seed for all random things I may use
 def set_seed(seed: int = 123):
     random.seed(seed)
     np.random.seed(seed)
@@ -37,7 +37,7 @@ def save_metrics_and_history(best_metrics, history,training_time):
     # Add timestamp + script name into the JSON content
     run_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    entry = {
+    entry = { # create a dictioanary for that entry to the .json
         "timestamp": run_time,
         "training_time": training_time,
         "best_metrics": best_metrics,
@@ -47,16 +47,16 @@ def save_metrics_and_history(best_metrics, history,training_time):
     # Load existing results if they exist
     if os.path.exists(results_file): # checks if the file exists
         with open(results_file, "r") as f:
-            all_results = json.load(f)
+            all_results = json.load(f) # if the file exists load the .json
     else:
         all_results = {} # if not create the dictionary
 
     # Update only this model’s entry
-    all_results[script_name] = entry
+    all_results[script_name] = entry 
 
     # Save back
     with open(results_file, "w") as f:
         json.dump(all_results, f, indent=4)
 
-    print(f"✅ Saved metrics & history for {script_name} at {run_time}")
+    print(f"Saved metrics & history for {script_name} at {run_time}")
         

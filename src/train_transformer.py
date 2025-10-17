@@ -17,13 +17,16 @@ set_seed()
 # Load processed data
 train_loader, test_loader = prepare_data()
 
-# Define Transformer Model Using FinBERT - TO-DO increase the power of this model.
+# Define Transformer Model Using FinBERT
 class Transformer(nn.Module):
     def __init__(self, hidden_dim, num_heads=8, num_layers=4, dropout=0.3):
         super(Transformer, self).__init__()
-        self.bert = AutoModel.from_pretrained("ProsusAI/finbert")
-        for param in self.bert.parameters():
-            param.requires_grad = False  # Freeze FinBERT
+
+        self.bert = AutoModel.from_pretrained("ProsusAI/finbert") # loading pre trained finbert for embeddings
+
+        # Freeze all FinBERT parameters for trianing efficiency - would train for so long otherwise
+        for param in self.bert.parameters(): # loops through all parameters in the bert model
+            param.requires_grad = False # sets all parameters no gradient
 
         embed_dim = 768  # FinBERT output dimension
 
@@ -31,10 +34,10 @@ class Transformer(nn.Module):
 
         encoder_layer = nn.TransformerEncoderLayer( # define the transformer encoder
             d_model=embed_dim,
-            nhead=num_heads,
-            dim_feedforward=hidden_dim,
+            nhead=num_heads, # number of self attention heads
+            dim_feedforward=hidden_dim, # size of the feedforward sub-layer inside the encoder
             dropout=dropout,
-            activation='relu',
+            activation='relu', # define the activation function - relu most common
             batch_first=True
         )
 
@@ -55,14 +58,18 @@ class Transformer(nn.Module):
         # get the embeddings from finbert
         with torch.no_grad():
             bert_out = self.bert(input_ids=input_ids, attention_mask=attention_mask)
+
         x = bert_out.last_hidden_state 
 
-        x = self.layernorm(x) # add a normalisation layer
+        x = self.layernorm(x) # add a normalisation layer for finbert encodings - stop exploding gradients
 
+        # Create mask so attention ignores padding tokens
         src_key_padding_mask = ~attention_mask.bool()
+
+        # Pass through the transformer encoder
         x = self.transformer_encoder(x, src_key_padding_mask=src_key_padding_mask)
 
-        x = x.mean(dim=1)  # Global average pooling
+        x = x.mean(dim=1)  # Global average pooling - summarise all tokens to a sentence level
 
         x = self.final_norm(x) # add a normalisation layer
 

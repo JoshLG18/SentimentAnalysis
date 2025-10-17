@@ -33,10 +33,6 @@ def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
 
         loss = criterion(outputs, labels) # compute loss
 
-        if torch.isnan(loss) or torch.isinf(loss):
-            print(f"⚠️ NaN/Inf loss at batch {batch_idx}, skipping update")
-            continue
-
         loss.backward() # backpropagation - compute the gradients
 
         # gradient clipping
@@ -51,9 +47,6 @@ def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
 
 
 # Evaluation
-from sklearn.preprocessing import label_binarize
-from sklearn.metrics import roc_auc_score
-
 def evaluate(model, dataloader, criterion, device, tokenizer):
     model.eval() # set the evaluation mode
     total_loss = 0.0 # initialise the total loss to 0
@@ -62,30 +55,38 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
     test_labels = []  
     all_probs = []
 
-    label_names = ["negative", "neutral", "positive"]
+    label_names = ["negative", "neutral", "positive"] # define the label names
 
     with torch.no_grad(): 
         for batch in dataloader: # mini-batching
+
+            # Initialise input, attention mask and the labels of the batch
             input_ids = batch["input_ids"].to(device)
             attention_mask = batch["attention_mask"].to(device)
             labels = batch["labels"].to(device)
 
+            # Compute the outputs of the prediction
             outputs = model(input_ids=input_ids, attention_mask=attention_mask)
+
+            #Compute the loss
             loss = criterion(outputs, labels)
-            total_loss += loss.item()
+            total_loss += loss.item() # add this batch loss to the running loss
 
-            preds = torch.argmax(outputs, dim=1)
-            probs = torch.softmax(outputs, dim=1)
+            preds = torch.argmax(outputs, dim=1) # predictions becomes the highest of the output vector
+            probs = torch.softmax(outputs, dim=1) # probs become the softmax of the output vector - add to one
 
-            all_preds.extend(preds.cpu().numpy())
-            all_labels.extend(labels.cpu().numpy())
-            all_probs.extend(probs.cpu().numpy())
+            all_preds.extend(preds.cpu().numpy()) # add the pred to the preds tensor
+            all_labels.extend(labels.cpu().numpy()) # adds the labels to the labels tensor
+            all_probs.extend(probs.cpu().numpy()) # adds the probs to the probs tensor
 
+            # decode the text for inference
             decoded_texts = tokenizer.batch_decode(input_ids, skip_special_tokens=True)
+            # add the text and the labels to an tensor
             test_texts.extend(decoded_texts)
             test_labels.extend(labels.cpu().numpy())
 
-    all_preds = np.array(all_preds)
+    # Convert the tensors into arrays
+    all_preds = np.array(all_preds) 
     all_labels = np.array(all_labels)
     all_probs = np.array(all_probs)
 
@@ -96,37 +97,38 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
     report = classification_report(all_labels, all_preds, target_names=label_names, zero_division=0, output_dict=True)
     cm = confusion_matrix(all_labels, all_preds)
 
-    # Compute AUC-ROC (multi-class)
+    # Compute AUC-ROC
     try:
-        y_true_bin = label_binarize(all_labels, classes=[0, 1, 2])
+        y_true_bin = label_binarize(all_labels, classes=[0, 1, 2]) # converts class labels into one-hot vector
         roc_auc = {}
-        for i, name in enumerate(label_names):
-            roc_auc[name] = roc_auc_score(y_true_bin[:, i], all_probs[:, i])
-        roc_auc["macro"] = roc_auc_score(y_true_bin, all_probs, average="macro")
-        roc_auc["micro"] = roc_auc_score(y_true_bin, all_probs, average="micro")
+        for i, name in enumerate(label_names): # loop through each sentiment class
+            roc_auc[name] = roc_auc_score(y_true_bin[:, i], all_probs[:, i]) # calcuate auc score
+
+        roc_auc["macro"] = roc_auc_score(y_true_bin, all_probs, average="macro") # computes macro/overall auc score
+
     except Exception as e:
         roc_auc = {"error": str(e)}
 
     example_tracker = {"correct": {}, "wrong": {}}
 
-    for text, true, pred in zip(test_texts, test_labels, all_preds):
-        true_name = label_names[true] if true < len(label_names) else str(true)
-        pred_name = label_names[pred] if pred < len(label_names) else str(pred)
+    for text, true, pred in zip(test_texts, test_labels, all_preds): # loop through each pair of test text, label and prediction
+        true_name = label_names[true] if true < len(label_names) else str(true) # converts integer labels into the word labels
+        pred_name = label_names[pred] if pred < len(label_names) else str(pred) # converts integer labels into the word labels
 
-        if true == pred and true_name not in example_tracker["correct"]:
-            example_tracker["correct"][true_name] = {
+        if true == pred and true_name not in example_tracker["correct"]:  # if the true is equal to the prediction
+            example_tracker["correct"][true_name] = { # add that label to the correct example tracker
                 "text": text,
                 "true": true_name,
                 "pred": pred_name,
             }
-        if true != pred and true_name not in example_tracker["wrong"]:
-            example_tracker["wrong"][true_name] = {
+        if true != pred and true_name not in example_tracker["wrong"]: # if the prediction is not equal to the true
+            example_tracker["wrong"][true_name] = {  # add that label to the wrong example tracker
                 "text": text,
                 "true": true_name,
                 "pred": pred_name,
             }
 
-    results = {
+    results = { # create a dictionary containing all of the results
         "loss": total_loss / len(dataloader),
         "accuracy": acc,
         "precision_weighted": prec_w,
@@ -186,12 +188,12 @@ def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler
 
         # Save best model and track patience
         if metrics["loss"] < best_val_loss:
-            best_val_loss = metrics["loss"]
-            best_metrics = metrics.copy()
-            best_metrics["train_loss"] = train_loss
-            torch.save(model.state_dict(), save_path)
-            patience_counter = 0
-            print(f"✅ New best model saved at epoch {epoch+1} with val_loss={best_val_loss:.4f}")
+            best_val_loss = metrics["loss"] # this epochs loss becomes the best val loss
+            best_metrics = metrics.copy() # copy all of the metrics into a best metric dict
+            best_metrics["train_loss"] = train_loss # set the best metric to this epochs train loss
+            torch.save(model.state_dict(), save_path) # save the models current stae
+            patience_counter = 0 # reset the patience counter to 0
+            print(f"New best model saved at epoch {epoch+1} with val_loss={best_val_loss:.4f}")
         else:
             patience_counter += 1 # if the better model isn't found increaase patience counter
             if patience_counter >= patience: # if patients is reached early stop
