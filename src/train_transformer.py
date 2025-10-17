@@ -44,7 +44,7 @@ class Transformer(nn.Module):
         # create the transformer encoder
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
         
-        self.final_norm = nn.LayerNorm(embed_dim)
+        self.final_norm = nn.LayerNorm(hidden_dim)
 
         # use a simple 2 layer FCL to output the logits
         self.classifier = nn.Sequential(
