@@ -24,7 +24,7 @@ def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
         # inidialise the input data, attention amsk and labels
         input_ids = batch["input_ids"].to(device) 
         attention_mask = batch["attention_mask"].to(device)
-        labels = batch["label"].to(device) 
+        labels = batch["labels"].to(device) 
 
         optimiser.zero_grad() # set the gradients of the optimsier back to 0
 
