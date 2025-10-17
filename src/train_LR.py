@@ -21,9 +21,9 @@ set_seed()
 
 def clean_text(text):
     text = re.sub(r"http\S+|www\S+|https\S+", "", text)   # remove URLs
-    text = re.sub(r"\(.*?\)", "", text)                   # remove parenthetical phrases (e.g., stock tickers)
-    text = re.sub(r"[^a-zA-Z0-9.,!?'\s]", "", text)       # remove weird symbols
-    text = re.sub(r"\s+", " ", text)                      # collapse extra whitespace
+    text = re.sub(r"\(.*?\)", "", text)                   # remove stock tickers
+    text = re.sub(r"[^a-zA-Z0-9.,!?'\s]", "", text)       # remove symbols
+    text = re.sub(r"\s+", " ", text)                      # remove extra whitespace
     text = text.strip()                                   # remove leading/trailing spaces
     return text
 
