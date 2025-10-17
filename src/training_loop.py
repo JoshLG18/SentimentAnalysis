@@ -24,21 +24,22 @@ def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
         # inidialise the input data, attention amsk and labels
         input_ids = batch["input_ids"].to(device) 
         attention_mask = batch["attention_mask"].to(device)
-        labels = batch["labels"].to(device)
+        labels = batch["label"].to(device) 
 
         optimiser.zero_grad() # set the gradients of the optimsier back to 0
 
         # compute the outputs of the prediction
         outputs = model(input_ids=input_ids, attention_mask=attention_mask) 
 
-        loss = criterion(outputs, labels) # compute loss
+        loss = criterion(outputs, labels) # compute loss
 
         loss.backward() # backpropagation - compute the gradients
 
         # gradient clipping
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         optimiser.step() # update the weights
-        #add the loss from this batch
+
+        # add the loss from this batch
         total_loss += loss.item()
 
         loop.set_postfix(loss=loss.item()) # add the current loss to the end of the progress bar
@@ -51,11 +52,13 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
     model.eval() # set the evaluation mode
     total_loss = 0.0 # initialise the total loss to 0
     all_preds, all_labels = [] , [] # create empty lists for the preds and labels
-    test_texts = []
-    test_labels = []  
-    all_probs = []
+    all_probs = [] # create an empty list for the probabilities
 
     label_names = ["negative", "neutral", "positive"] # define the label names
+
+    # get the original text and labels from the dataset
+    test_texts = dataloader.dataset["text"]
+    test_labels = dataloader.dataset["label"]
 
     with torch.no_grad(): 
         for batch in dataloader: # mini-batching
@@ -63,7 +66,7 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
             # Initialise input, attention mask and the labels of the batch
             input_ids = batch["input_ids"].to(device)
             attention_mask = batch["attention_mask"].to(device)
-            labels = batch["labels"].to(device)
+            labels = batch["label"].to(device)  # fixed: use 'label' not 'labels'
 
             # Compute the outputs of the prediction
             outputs = model(input_ids=input_ids, attention_mask=attention_mask)
@@ -78,12 +81,6 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
             all_preds.extend(preds.cpu().numpy()) # add the pred to the preds tensor
             all_labels.extend(labels.cpu().numpy()) # adds the labels to the labels tensor
             all_probs.extend(probs.cpu().numpy()) # adds the probs to the probs tensor
-
-            # decode the text for inference
-            decoded_texts = tokenizer.batch_decode(input_ids, skip_special_tokens=True)
-            # add the text and the labels to an tensor
-            test_texts.extend(decoded_texts)
-            test_labels.extend(labels.cpu().numpy())
 
     # Convert the tensors into arrays
     all_preds = np.array(all_preds) 
@@ -107,26 +104,33 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
         roc_auc["macro"] = roc_auc_score(y_true_bin, all_probs, average="macro") # computes macro/overall auc score
 
     except Exception as e:
-        roc_auc = {"error": str(e)}
+        roc_auc = {"error": str(e)} # if auc fails for a class not present, log the error
 
-    example_tracker = {"correct": {}, "wrong": {}}
+    example_tracker = {"correct": {}, "wrong": {}} # create a dictionary to store correct and wrong examples
 
-    for text, true, pred in zip(test_texts, test_labels, all_preds): # loop through each pair of test text, label and prediction
+    # loop through each pair of test text, label and prediction
+    for text, true, pred in zip(test_texts, all_labels, all_preds): 
         true_name = label_names[true] if true < len(label_names) else str(true) # converts integer labels into the word labels
         pred_name = label_names[pred] if pred < len(label_names) else str(pred) # converts integer labels into the word labels
 
-        if true == pred and true_name not in example_tracker["correct"]:  # if the true is equal to the prediction
-            example_tracker["correct"][true_name] = { # add that label to the correct example tracker
+        # add multiple examples per class (not just one) for both correct and wrong predictions
+        if true == pred:  # if the true is equal to the prediction
+            example_tracker["correct"].setdefault(true_name, []).append({ # add that label to the correct example tracker
                 "text": text,
                 "true": true_name,
                 "pred": pred_name,
-            }
-        if true != pred and true_name not in example_tracker["wrong"]: # if the prediction is not equal to the true
-            example_tracker["wrong"][true_name] = {  # add that label to the wrong example tracker
+            })
+        else: # if the prediction is not equal to the true
+            example_tracker["wrong"].setdefault(true_name, []).append({  # add that label to the wrong example tracker
                 "text": text,
                 "true": true_name,
                 "pred": pred_name,
-            }
+            })
+
+    # optional: limit examples per class to make output JSON smaller
+    for category in ["correct", "wrong"]:
+        for cls in example_tracker[category]:
+            example_tracker[category][cls] = example_tracker[category][cls][:1]  # keep up to 3 examples
 
     results = { # create a dictionary containing all of the results
         "loss": total_loss / len(dataloader),
@@ -148,7 +152,7 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
 
 # Training loop with early stopping
 def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler,
-                criterion, device,tokeniser, epochs=EPOCHS, patience=5):
+                criterion, device, tokeniser, epochs=EPOCHS, patience=5):
     
     # set up the history dictionary to store the training metrics
     history = {

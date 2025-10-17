@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 from transformers import AutoTokenizer, DataCollatorWithPadding
 from torch.utils.data import DataLoader
 from utils import BATCH_SIZE
+import re
 
 # Constants
 MODEL_NAME = "ProsusAI/finbert" # defines the finbert model used
@@ -12,12 +13,24 @@ MODEL_NAME = "ProsusAI/finbert" # defines the finbert model used
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME) # load the tokenizer from finbert
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer) # load the colaltor from finbert
 
+def clean_text(text):
+    text = re.sub(r"http\S+|www\S+|https\S+", "", text)   # remove URLs
+    text = re.sub(r"\(.*?\)", "", text)                   # remove parenthetical phrases (e.g., stock tickers)
+    text = re.sub(r"[^a-zA-Z0-9.,!?'\s]", "", text)       # remove weird symbols
+    text = re.sub(r"\s+", " ", text)                      # collapse extra whitespace
+    text = text.strip()                                   # remove leading/trailing spaces
+    return text
+
+
 # Load and process dataset
 def prepare_data(test_size=0.2, random_state=123):
     # Load raw data from Hugging Face
     raw_dataset = load_dataset("lukecarlate/english_finance_news")
     df = raw_dataset["train"].to_pandas()[["newscontents", "label"]]
     df.columns = ["text", "label"]
+
+    df["text"] = df["text"].apply(clean_text) # cleans all the text
+
 
     # Train/test split using stratified sampling - ensures class imbalance is maintained in the splits
     train_df, test_df = train_test_split(
