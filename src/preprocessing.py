@@ -52,7 +52,7 @@ def prepare_data(test_size=0.2, random_state=123):
 
     # converts the hugging face datasets into tensors
     train_ds.set_format(type="torch", columns=["input_ids", "attention_mask", "label"]) 
-    test_ds.set_format(type="torch", columns=["input_ids", "attention_mask", "label", "text"])  # ✅ keep text for evaluation
+    test_ds.set_format(type="torch", columns=["input_ids", "attention_mask", "label"]) 
 
     # Dataloaders
     train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, collate_fn=data_collator)

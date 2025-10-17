@@ -57,8 +57,9 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
     label_names = ["negative", "neutral", "positive"] # define the label names
 
     # get the original text and labels from the dataset
-    test_texts = dataloader.dataset["text"]
-    test_labels = dataloader.dataset["label"]
+    dataset_df = dataloader.dataset.to_pandas()
+    test_texts = dataset_df["text"].tolist()
+    test_labels = dataset_df["label"].tolist()
 
     with torch.no_grad(): 
         for batch in dataloader: # mini-batching
@@ -130,7 +131,7 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
     # optional: limit examples per class to make output JSON smaller
     for category in ["correct", "wrong"]:
         for cls in example_tracker[category]:
-            example_tracker[category][cls] = example_tracker[category][cls][:1]  # keep up to 3 examples
+            example_tracker[category][cls] = example_tracker[category][cls][:3]  # keep up to 3 examples
 
     results = { # create a dictionary containing all of the results
         "loss": total_loss / len(dataloader),
