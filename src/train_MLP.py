@@ -36,8 +36,13 @@ class MLP(nn.Module):
         self.relu2 = nn.ReLU()
         self.dropout2 = nn.Dropout(0.3)
 
+        # Layer 3
+        self.fc3 = nn.Linear(hidden_dim // 2, hidden_dim // 4)
+        self.relu3 = nn.ReLU()
+        self.dropout3 = nn.Dropout(0.3)
+
         # Output layer
-        self.fc3 = nn.Linear(hidden_dim // 2, output_dim)
+        self.fc4 = nn.Linear(hidden_dim // 4, output_dim)
 
     def forward(self, input_ids, attention_mask):
         # Extract contextual embeddings from FinBERT
@@ -47,17 +52,15 @@ class MLP(nn.Module):
         # Mean pooling to get a single sentence embedding
         x = torch.mean(bert_output.last_hidden_state, dim=1)
 
-        # Forward pass through MLP layers
-        out = self.fc1(x)
-        out = self.relu1(out)
-        out = self.dropout1(out)
+        # Forward pass through hidden layers
+        x = self.dropout1(self.relu1(self.fc1(x)))
+        x = self.dropout2(self.relu2(self.fc2(x)))
+        x = self.dropout3(self.relu3(self.fc3(x)))
 
-        out = self.fc2(out)
-        out = self.relu2(out)
-        out = self.dropout2(out)
-
-        out = self.fc3(out)  # output raw logits
+        # Output logits
+        out = self.fc4(x)
         return out
+
     
 # Initialize model, loss function, and optimiser
 model = MLP(
@@ -65,7 +68,7 @@ model = MLP(
             output_dim=3,
             ).to(DEVICE)
 criterion = nn.CrossEntropyLoss(label_smoothing=0.1) # Label smoothing
-optimiser = optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-5) # L2 Regularisation
+optimiser = optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-5) # L2 Regularisation
 # use reduce LR on plateau
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5) 
 

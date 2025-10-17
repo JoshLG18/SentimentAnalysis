@@ -20,43 +20,50 @@ train_loader, test_loader = prepare_data() # prep the data
 
 #Crearte the LSTM model
 class LSTMSentiment(nn.Module):
-    def __init__(self, hidden_dim, num_layers=2):
+    def __init__(self, hidden_dim, num_layers=3, dropout=0.3):
         super(LSTMSentiment, self).__init__()
 
-        self.bert = AutoModel.from_pretrained("ProsusAI/finbert") # uses finbert for the embedding layer
+        self.bert = AutoModel.from_pretrained("ProsusAI/finbert")
 
         for param in self.bert.parameters():
-            param.requires_grad = False  # freeze FinBERT
+            param.requires_grad = False
 
-        self.lstm = nn.LSTM(input_size=768,  # run the lstm Layers
-                            hidden_size=hidden_dim,
-                            num_layers=num_layers,
-                            batch_first=True,
-                            bidirectional=True,
-                            dropout=0.3)
+        embed_dim = 768
 
-        self.attention = nn.Linear(hidden_dim * 2, hidden_dim * 2) # run the attention layer
-        self.fc = nn.Linear(hidden_dim * 2, 3) # run the final fully connected layer
+        self.lstm = nn.LSTM(
+            input_size=embed_dim,
+            hidden_size=hidden_dim,
+            num_layers=num_layers,
+            batch_first=True,
+            bidirectional=True,
+            dropout=dropout
+        )
+
+        self.layernorm = nn.LayerNorm(hidden_dim * 2)
+        self.attention = nn.Linear(hidden_dim * 2, hidden_dim * 2)
+        self.dropout = nn.Dropout(dropout)
+        self.fc = nn.Linear(hidden_dim * 2, 3)
 
     def forward(self, input_ids, attention_mask):
-        with torch.no_grad():
+        with torch.set_grad_enabled(any(p.requires_grad for p in self.bert.parameters())):
             bert_out = self.bert(input_ids=input_ids, attention_mask=attention_mask)
+        
         x = bert_out.last_hidden_state
 
-        lstm_out, _ = self.lstm(x) # forward pass through the lstm
+        lstm_out, _ = self.lstm(x)
+        lstm_out = self.layernorm(lstm_out)
 
-        att_scores = self.attention(lstm_out) # get the attention scores
-        attn_weights = torch.softmax(att_scores, dim=1) # get the attention weights
-        context = torch.sum(attn_weights * lstm_out, dim=1) # get the context vector
+        att_scores = torch.tanh(self.attention(lstm_out))
+        attn_weights = torch.softmax(att_scores, dim=1)
+        context = torch.sum(attn_weights * lstm_out, dim=1)
 
-        out = self.fc(context) # use the context layer to output
+        out = self.fc(self.dropout(context))
         return out
-
 
 # Initialize model, loss function, and optimizer
 model = LSTMSentiment(HIDDEN_DIM).to(DEVICE)
 criterion = nn.CrossEntropyLoss(label_smoothing=0.1) # loss function with label smoothing
-optimiser = optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-5) # optim with l2 regularisation
+optimiser = optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-5) # optim with l2 regularisation
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5)
 
 model_save_loc = '../results/saved_models/LSTM.pt' # set where we want to save the model

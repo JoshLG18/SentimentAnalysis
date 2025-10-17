@@ -9,6 +9,8 @@ from sklearn.metrics import (
 )
 from utils import EPOCHS
 from tqdm import tqdm
+from sklearn.preprocessing import label_binarize
+from sklearn.metrics import roc_auc_score
 
 # Train one epoch
 def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
@@ -49,55 +51,62 @@ def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
 
 
 # Evaluation
+from sklearn.preprocessing import label_binarize
+from sklearn.metrics import roc_auc_score
+
 def evaluate(model, dataloader, criterion, device, tokenizer):
     model.eval() # set the evaluation mode
-    total_loss = 0.0 # initialse the total loss to 0
-    all_preds, all_labels = [], [] # create empty lists for the preds and labels
+    total_loss = 0.0 # initialise the total loss to 0
+    all_preds, all_labels = [] , [] # create empty lists for the preds and labels
     test_texts = []
     test_labels = []  
+    all_probs = []
+
+    label_names = ["negative", "neutral", "positive"]
 
     with torch.no_grad(): 
         for batch in dataloader: # mini-batching
-            # set up the input, attention and labels
             input_ids = batch["input_ids"].to(device)
             attention_mask = batch["attention_mask"].to(device)
             labels = batch["labels"].to(device)
 
-            # compute the output, loss and increment the total loss
             outputs = model(input_ids=input_ids, attention_mask=attention_mask)
             loss = criterion(outputs, labels)
             total_loss += loss.item()
 
-            # prediction chooses the largest of the output logits
             preds = torch.argmax(outputs, dim=1)
-            all_preds.extend(preds.cpu().numpy()) # add the pred to the list
-            all_labels.extend(labels.cpu().numpy()) # add the label to the list
+            probs = torch.softmax(outputs, dim=1)
+
+            all_preds.extend(preds.cpu().numpy())
+            all_labels.extend(labels.cpu().numpy())
+            all_probs.extend(probs.cpu().numpy())
 
             decoded_texts = tokenizer.batch_decode(input_ids, skip_special_tokens=True)
             test_texts.extend(decoded_texts)
             test_labels.extend(labels.cpu().numpy())
 
-
-    # convert lists to numpy arrays
     all_preds = np.array(all_preds)
     all_labels = np.array(all_labels)
+    all_probs = np.array(all_probs)
 
     # Compute the Metrics 
-    acc = accuracy_score(all_labels, all_preds) # accuracy
-
-    # precision, recall and f1; weighted and overall/macro
+    acc = accuracy_score(all_labels, all_preds)
     prec_w, rec_w, f1_w, _ = precision_recall_fscore_support(all_labels, all_preds, average="weighted", zero_division=0)
     prec_m, rec_m, f1_m, _ = precision_recall_fscore_support(all_labels, all_preds, average="macro", zero_division=0)
-
-    # create the classification report which gives the metrics for each class
     report = classification_report(all_labels, all_preds, target_names=label_names, zero_division=0, output_dict=True)
-
-    #  create the confusion matrix
     cm = confusion_matrix(all_labels, all_preds)
 
-    # TO-DO Add in AUC Curves
+    # Compute AUC-ROC (multi-class)
+    try:
+        y_true_bin = label_binarize(all_labels, classes=[0, 1, 2])
+        roc_auc = {}
+        for i, name in enumerate(label_names):
+            roc_auc[name] = roc_auc_score(y_true_bin[:, i], all_probs[:, i])
+        roc_auc["macro"] = roc_auc_score(y_true_bin, all_probs, average="macro")
+        roc_auc["micro"] = roc_auc_score(y_true_bin, all_probs, average="micro")
+    except Exception as e:
+        roc_auc = {"error": str(e)}
 
-    label_names = ["negative", "neutral", "positive"]
     example_tracker = {"correct": {}, "wrong": {}}
 
     for text, true, pred in zip(test_texts, test_labels, all_preds):
@@ -117,8 +126,8 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
                 "pred": pred_name,
             }
 
-    # Store results
     results = {
+        "loss": total_loss / len(dataloader),
         "accuracy": acc,
         "precision_weighted": prec_w,
         "recall_weighted": rec_w,
@@ -128,10 +137,12 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
         "f1_macro": f1_m,
         "report": report,
         "confusion_matrix": cm.tolist(),
-        "examples": example_tracker
+        "examples": example_tracker,
+        "roc_auc": roc_auc
     }
 
     return results
+
 
 # Training loop with early stopping
 def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler,

@@ -19,7 +19,7 @@ train_loader, test_loader = prepare_data()
 
 # Define Transformer Model Using FinBERT - TO-DO increase the power of this model.
 class Transformer(nn.Module):
-    def __init__(self, hidden_dim, num_heads=4, num_layers=2, dropout=0.3):
+    def __init__(self, hidden_dim, num_heads=8, num_layers=4, dropout=0.3):
         super(Transformer, self).__init__()
         self.bert = AutoModel.from_pretrained("ProsusAI/finbert")
         for param in self.bert.parameters():
@@ -40,6 +40,8 @@ class Transformer(nn.Module):
 
         # create the transformer encoder
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
+        
+        self.final_norm = nn.LayerNorm(hidden_dim)
 
         # use a simple 2 layer FCL to output the logits
         self.classifier = nn.Sequential(
@@ -61,6 +63,8 @@ class Transformer(nn.Module):
         x = self.transformer_encoder(x, src_key_padding_mask=src_key_padding_mask)
 
         x = x.mean(dim=1)  # Global average pooling
+
+        x = self.final_norm(x) # add a normalisation layer
 
         return self.classifier(x) # run the classifier to get the output and return it
 
