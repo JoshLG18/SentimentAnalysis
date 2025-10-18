@@ -5,6 +5,10 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{float}
+
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -22,6 +26,7 @@
 \date{}
 \maketitle
 \thispagestyle{fancy}
+\vspace{-4em}
 
 
 %-------------------------------------------------------%
@@ -29,24 +34,25 @@
 % Background and motivation: why this question matters.
 % Clear statement of your research question.
 % Context or prior work if relevant.
-Traditional financial models are reliant on pure quantative data such as stock prices and macroeconomic indicators.
-However, markets do not move on numbers alone. 
-Increasingly, sentiment has been incorperated to capture market reactions that close prices alone may miss (Atkins, 2018).
-Among text sources social media has recieved the majority of research within the industry however, 
+Traditional financial models are fully reliant on quantative inputs such as stock prices and macroeconomic indicators.
+Yet, these indicators rarely capture the full picture of market behaviour.
+In recent years, there has been growing interest in integrating sentiment analysis to account for the emotional and 
+psychological factors that influence investor decisions (Atkins, 2018).
+Among text sources social media has recieved the majority of research within the industry, on the other hand, 
 news content has recieved less attention despite its proven potential (Ashtiani, 2023).
 
-While traditional machine learining (ML) methods provided a foundation for sentiment analysis, they fall short in more complex domains like finance. 
-These models rely on domain-specific feature enigneering limiting their ability to understand complex or subtle sentiments which are frequnt in finacial news (Bashiri and Naderi, 2024).
-This can also introduce bias into these models, reducing generalisability and their power in unseen datasets.
-Deep learning methods such as RNNs, LSTMs and Transformers offer a more robust alternative stemming from their ability to capture sequential patterns, 
+While traditional machine learining (ML) methods provided a foundation for sentiment analysis, they underperform in more complex domains like finance. 
+ML models rely on domain-specific feature enigneering limiting their ability to understand complex or subtle sentiments which are frequent in finacial news (Bashiri and Naderi, 2024).
+This can also introduce bias, reducing generalisability and their power in unseen datasets.
+Deep learning methods such as RNNs, LSTMs and Transformers offer a more accurate alternative, stemming from their ability to capture sequential patterns, 
 making them better suited for analysing sentiment in financial news (Bashiri and Naderi, 2024).
 
-FinBERT, introduced by Huang, Wang, and Yang (2022), is a domain-specific language model based on BERT but trained on financial documents and news. 
-It significantly outperforms general-purpose models and other ML methods e.g. BERT, Naive Bayes and LSTMs
-in extracting sentiment and insights from financial text, proving that these methods hold value in stock market prediction.
+FinBERT, developed by Huang, Wang, and Yang (2022), is a finance-specific language model based on BERT but trained on financial documents and news. 
+It significantly outperforms general-purpose models and other ML methods, e.g. BERT, Naive Bayes and LSTMs,
+in extracting sentiment and insights from financial text, proving that these more complex methods hold value in sentiment analysis and stock market prediction.
 
 This project compares multiple neural architectures to evaluate which best captures financial sentiment from news headlines, 
-with the aim of identifying patterns that could signal market movement more effectively than traditional data alone.
+with the aim of identifying patterns that could identify market movement more effectively than traditional data alone.
 
 
 %-------------------------------------------------------%
@@ -54,32 +60,50 @@ with the aim of identifying patterns that could signal market movement more effe
 % Source of the dataset.
 % Key features, size, and any notable characteristics.
 % Any pre-processing steps applied (cleaning, feature selection, transformations).
-This project uses the English Financial News dataset (Calarte, 2023), which includes roughly 27,000 financial news headlines
-from twitter and yahoo finance, each observation is labelled as positive, negative or neutral. This dataset was selected 
-due to the large corpus of textual data, which will accurately reflect the types of news that will affect financial markets.
+This project uses the \textit{English Financial News} dataset (Calarte, 2023), which contains approximately 27,000 
+financial news headlines collected from Twitter and Yahoo Finance. Each headline is labelled as \textit{positive}, 
+\textit{negative}, or \textit{neutral} according to its expressed sentiment. 
 
-The dataset was split 80/20 into a training and testing set.
+The dataset was selected due to its large and diverse corpus of real-world financial language, which closely represents 
+the types of news and social media content that influence investor sentiment and market movements. 
 
-While well-suited to sentiment classification, the dataset is slightly imbalanced, with neutral sentiment more frequent.
+Given the unstructured nature of textual data, preprocessing was required before training the models. 
+The following steps were applied:
+
+\begin{itemize}
+    \item Removal of URLs, stock tickers, special symbols, and extraneous whitespace.
+    \item Tokenisation and vectorisation of each sentence to convert text into numerical form suitable for neural network input.
+\end{itemize}
+
+The dataset was split into training (80\%) and testing (20\%) subsets to enable model evaluation. 
+While well-suited for sentiment classification tasks, the dataset exhibits a mild class imbalance, 
+with \textit{neutral} sentiment being most common. This imbalance was accounted for during model training through 
+appropriate sampling and weighting techniques.
 
 %-------------------------------------------------------%
 \section{Methods}
 % Description of ML techniques applied (regression, classification, clustering, etc.).
 % Justification of method choice.
 % Any assumptions made and rationale.
-Describe the ML methods applied (regression, classification, clustering, etc).
-Justify the choice of methods and mention assumptions, if any.
-There is no need to go into the basics of your techniques, as these should already be discussed in the references~\cite{foucault2000order} you use (find appropriate references!). Instead, focus on explaining how you implemented and applied these techniques. Please provide detailed information about the parametrisation and experimental setup, ensuring that it is comprehensive enough for others to replicate your work.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+This project defines financial sentiment prediction as a three-class classification problem, 
+labelling each headline as positive, neutral or negative. A baseline TF-IDF + Logistic Regression model 
+was compared with three neural architectures (MLP, LSTM and Transformer) trained on FinBERT
+ contextual embeddings from ProsusAI (2023).
+
+The baseline used TF-IDF features and classified using Logistic Regression,
+ which is commonly included in previous research (Karanikola et al., 2023)
+
+Each headline was encoded using FinBERT (Huang, Wang and Yang, 2022), which generates 
+contextual and positional embeddings, as it had been shown to outperform 
+general-purpose models in financial sentiment tasks (Huang, Wang and Yang, 2022). These embeddings 
+were then passed through three architectures: an MLP with ReLU activation (Goodfellow et al., 2023), 
+a bidirectional LSTM to model sequential relationships (Sharaff et al., 2023), 
+and a lightweight Transformer with self-attention (Vaswani et al., 2017).
+
+All models were trained on 80\% of the data with early stopping and evaluated on the remaining 20\% 
+using various performance metrics. Full details on training parameters, metrics and architecture 
+configurations are provided in the appendix.
 
 %-------------------------------------------------------%
 \section{Results}
@@ -163,10 +187,70 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 %-------------------------------------------------------%
 \clearpage
 % Include your appendix here, if necessary.
-% \section*{Appendix}
 % % Appendix (optional, unlimited)
 % % Code snippets, supplementary figures, tables, or additional materials.
 % % Will not be marked but can provide supporting evidence.
+
+\section*{Appendix A - Extended Methods}
+\vspace{-1em}
+
+\begin{table}[H]
+\centering
+\caption{Summary of Methods and Model Architectures}
+\begin{tabularx}{\textwidth}{@{} l X @{}}
+\toprule
+\textbf{Component} & \textbf{Description / Configuration} \\
+
+\midrule
+
+\textbf{Preprocessing} & 
+\begin{itemize}
+    \vspace{-1em}
+    \item Lowercased all text
+    \item Removed URLs, stock tickers (e.g., \texttt{\$AAPL}), special characters
+    \item Removed extra whitespace
+\end{itemize} \\
+
+\midrule
+
+\textbf{Tokenisation and Embeddings} &
+\begin{itemize}
+    \vspace{-1em}
+    \item Used \texttt{ProsusAI/finbert} (ProsusAI, 2023) tokenizer from Hugging Face
+    \item Truncated input sequences to a maximum length of 64 tokens
+    \item No padding at tokenisation step; applied dynamically during batching
+    \item Extracted 768-dimensional [CLS] embeddings from FinBERT
+\end{itemize} \\
+
+\midrule
+
+\textbf{Model Architectures} &
+\begin{itemize}
+    \vspace{-1em}
+    \item \textbf{Baseline:} TF-IDF + Logistic Regression
+    \item \textbf{MLP:} Three fully connected layers (768 $\rightarrow$ 256 $\rightarrow$ 128 $\rightarrow$ 64) with ReLU activations, dropout (0.3), and LayerNorm; output fed to a softmax classifier.
+    \item \textbf{LSTM:} Three-layer bidirectional LSTM (hidden size = 256) with dropout (0.3), followed by LayerNorm, an attention layer, and a final classification layer for 3-class output.
+    \item \textbf{Transformer:} Four-layer Transformer Encoder with 8 attention heads, feedforward dim = 256, LayerNorm before/after encoding, followed by a two-layer MLP classifier.
+    \item All models use FinBERT contextual embeddings as frozen input features.
+\end{itemize} \\
+
+\midrule
+
+\textbf{Training Process} &
+\begin{itemize}
+    \vspace{-1em}
+    \item Loss Function - CrossEntropy Loss with L2 Regularisation and Label Smoothing
+    \item Optimiser - AdamW with learning rate of $1 \times 10^{-4}$
+    \item Gradient clipping at max norm of 1.0 to prevent exploding gradients
+    \item Applied early stopping with a patience of 5 epochs (monitored validation loss)
+    \item Trained for a maximum of 100 epochs with batch size of 64
+    \item FinBERT parameters frozen to reduce training time and memory usage
+\end{itemize} \\
+
+
+\end{tabularx}
+\end{table}
+
 
 %-------------------------------------------------------%
 \end{document}
