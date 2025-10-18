@@ -101,6 +101,11 @@ def train_baseline_tfidf_lr(save_path="../results/saved_models/tfidf_lr.pkl"):
                 "pred": pred_name,
             }
 
+    # limit examples per class
+    for category in ["correct", "wrong"]:
+        for cls in example_tracker[category]:
+            example_tracker[category][cls] = example_tracker[category][cls][:3]  # keep up to 3 examples
+
     # Store results
     results = { # create a dictionary to return the results
         "accuracy": acc,

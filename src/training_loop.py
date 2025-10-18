@@ -128,7 +128,7 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
                 "pred": pred_name,
             })
 
-    # optional: limit examples per class to make output JSON smaller
+    # limit examples per class
     for category in ["correct", "wrong"]:
         for cls in example_tracker[category]:
             example_tracker[category][cls] = example_tracker[category][cls][:3]  # keep up to 3 examples
