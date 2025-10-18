@@ -84,22 +84,23 @@ def train_baseline_tfidf_lr(save_path="../results/saved_models/tfidf_lr.pkl"):
     label_names = ["negative", "neutral", "positive"]
     example_tracker = {"correct": {}, "wrong": {}}
 
-    for text, true, pred in zip(test_texts, test_labels, preds):  # loop through each pair of test text, label and prediction
-        true_name = label_names[true] if true < len(label_names) else str(true) # converts integer labels into the word labels
-        pred_name = label_names[pred] if pred < len(label_names) else str(pred) # converts integer labels into the word labels
+    for text, true, pred in zip(test_texts, test_labels, preds):  # loop through each pair of test text, true label, and prediction
+        true_name = label_names[true] if true < len(label_names) else str(true)  # convert integer label into corresponding string label (e.g., 0 -> 'negative')
+        pred_name = label_names[pred] if pred < len(label_names) else str(pred)  # convert integer prediction into string label (e.g., 2 -> 'positive')
 
-        if true == pred and true_name not in example_tracker["correct"]: # if the true is equal to the prediction
-            example_tracker["correct"][true_name] = { # add that label to the correct example tracker
-                "text": text,
-                "true": true_name,
-                "pred": pred_name,
-            }
-        if true != pred and true_name not in example_tracker["wrong"]: # if the prediction is not equal to the true
-            example_tracker["wrong"][true_name] = {  # add that label to the wrong example tracker
-                "text": text,
-                "true": true_name,
-                "pred": pred_name,
-            }
+        category = "correct" if true == pred else "wrong"  # determine whether the prediction was correct or wrong
+
+        # if this label category hasn’t been seen yet, create a new list for it
+        if true_name not in example_tracker[category]:
+            example_tracker[category][true_name] = []
+
+        # only keep up to 3 example texts per class to make output more concise
+        if len(example_tracker[category][true_name]) < 3:
+            example_tracker[category][true_name].append({
+                "text": text,       # store the actual news text
+                "true": true_name,  # store the true class label
+                "pred": pred_name,  # store the predicted class label
+            })
 
     # limit examples per class
     for category in ["correct", "wrong"]:
