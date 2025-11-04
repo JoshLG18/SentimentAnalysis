@@ -11,7 +11,7 @@ from utils import save_metrics_and_history
 from transformers import AutoModel
 from preprocessing import tokenizer
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore') # turn off warnings so i don't lose my mind
 
 set_seed() # set the seeds
 

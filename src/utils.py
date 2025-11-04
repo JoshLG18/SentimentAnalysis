@@ -15,13 +15,10 @@ EPOCHS = 100
 LEARNING_RATE = 1e-4
 
 # Set the seed for all random things I may use
-def set_seed(seed: int = 123):
+def set_seed(seed = 123):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
 
 # save all the metrics to the right file
 def save_metrics_and_history(best_metrics, history,training_time):

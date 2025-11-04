@@ -1,17 +1,17 @@
+# load libraries
 from utils import DEVICE, HIDDEN_DIM, LEARNING_RATE, set_seed
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import warnings
 import time
-
 from training_loop import train_model
 from preprocessing import prepare_data
 from utils import save_metrics_and_history
 from transformers import AutoModel
 from preprocessing import tokenizer
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore') # turn off warnings so i don't lose my mind
 set_seed()
 
 # Load processed data
@@ -80,9 +80,9 @@ class Transformer(nn.Module):
 model = Transformer(hidden_dim=HIDDEN_DIM).to(DEVICE)
 
 criterion = nn.CrossEntropyLoss(label_smoothing=0.1) # Label smoothing to improve regularisation / decrease overfitting
-optimiser = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-4) # L2 reg
+optimiser = optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-4) # L2 reg
 # if the loss hasnt improved after 2 epochs reduce lr by 50%
-scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5) # decrease LR on plateau
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min', patience=2, factor=0.5) # decrease LR on plateau
 
 model_save_loc = '../results/saved_models/transformer.pt'
 

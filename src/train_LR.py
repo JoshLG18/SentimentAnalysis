@@ -1,7 +1,6 @@
 # import all libraries
 import warnings
 import time
-import json
 import joblib
 from utils import set_seed, save_metrics_and_history
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -10,13 +9,15 @@ from sklearn.metrics import (
     accuracy_score,
     precision_recall_fscore_support,
     classification_report,
-    confusion_matrix
+    confusion_matrix,
+    roc_auc_score
 )
+from sklearn.preprocessing import label_binarize
 from datasets import load_dataset
 from sklearn.model_selection import train_test_split
 import re
 
-warnings.filterwarnings("ignore")
+warnings.filterwarnings('ignore') # turn off warnings so i don't lose my mind
 set_seed()
 
 def clean_text(text):
@@ -59,7 +60,7 @@ def train_baseline_tfidf_lr(save_path="../results/saved_models/tfidf_lr.pkl"):
     # Define TF-IDF + Logistic Regression pipeline
     print("Initialising TF-IDF + Logistic Regression...")
     vectorizer = TfidfVectorizer(ngram_range=(1, 2), stop_words="english") # define the vectorizer
-    model = LogisticRegression(class_weight='balanced') # define the lr model with class weights to take into accound class imbalance
+    model = LogisticRegression(class_weight='balanced', max_iter=1000) # define the lr model with class weights to take into accound class imbalance
 
     # Train model
     print("Training baseline model...")
@@ -73,6 +74,7 @@ def train_baseline_tfidf_lr(save_path="../results/saved_models/tfidf_lr.pkl"):
 
     # make predictions
     preds = model.predict(X_test)
+    probs = model.predict_proba(X_test)  # probabilities for AUC
 
     # Metrics and examples
     acc = accuracy_score(test_labels, preds)
@@ -80,6 +82,21 @@ def train_baseline_tfidf_lr(save_path="../results/saved_models/tfidf_lr.pkl"):
     prec_m, rec_m, f1_m, _ = precision_recall_fscore_support(test_labels, preds, average="macro", zero_division=0)
     report = classification_report(test_labels, preds, output_dict=True, zero_division=0)
     cm = confusion_matrix(test_labels, preds)
+
+    # Compute AUC-ROC
+    try:
+        y_true_bin = label_binarize(test_labels, classes=[0, 1, 2]) # converts class labels into one-hot vector
+        roc_auc = {}
+        label_names = ["negative", "neutral", "positive"]
+
+        for i, name in enumerate(label_names): # loop through each sentiment class
+            roc_auc[name] = roc_auc_score(y_true_bin[:, i], probs[:, i]) # calcuate auc score
+
+        roc_auc["macro"] = roc_auc_score(y_true_bin, probs, average="macro") # computes macro/overall auc score
+        roc_auc["weighted"] = roc_auc_score(y_true_bin, probs, average="weighted") # computes weighted auc score
+
+    except Exception as e:
+        roc_auc = {"error": str(e)} # if auc fails for a class not present, log the error
 
     label_names = ["negative", "neutral", "positive"]
     example_tracker = {"correct": {}, "wrong": {}}
@@ -116,6 +133,7 @@ def train_baseline_tfidf_lr(save_path="../results/saved_models/tfidf_lr.pkl"):
         "precision_macro": prec_m,
         "recall_macro": rec_m,
         "f1_macro": f1_m,
+        "roc_auc": roc_auc, # include per-class and macro AUCs
         "report": report,
         "confusion_matrix": cm.tolist(),
         "examples": example_tracker

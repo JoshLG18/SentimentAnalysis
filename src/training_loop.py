@@ -180,7 +180,7 @@ def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler
               f"Acc: {metrics['accuracy']:.4f} | "
               f"F1_w: {metrics['f1_weighted']:.4f}")
 
-        # Store metrics
+        # Store metrics in the dictionary
         history["train_loss"].append(train_loss)
         history["val_loss"].append(metrics["loss"])
         history["accuracy"].append(metrics["accuracy"])
