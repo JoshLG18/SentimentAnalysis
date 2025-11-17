@@ -7,7 +7,6 @@ from datetime import datetime
 # set the training device 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
 # set the hyperparameters 
 HIDDEN_DIM = 256
 BATCH_SIZE = 64

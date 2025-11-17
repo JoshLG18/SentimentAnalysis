@@ -51,53 +51,44 @@ def prepare_data_tfidf(test_size=0.2, random_state=123):
 
     return train_texts, train_labels, test_texts, test_labels # return the test and train texts and labels
 
-
 # Train and evaluate model
 def train_baseline_tfidf_lr(save_path="../results/saved_models/tfidf_lr.pkl"):
-    print("Preparing data...")
     train_texts, train_labels, test_texts, test_labels = prepare_data_tfidf() # prep the data - loading and splitting
 
-    # Define TF-IDF + Logistic Regression pipeline
-    print("Initialising TF-IDF + Logistic Regression...")
-    vectorizer = TfidfVectorizer(ngram_range=(1, 2), stop_words="english") # define the vectorizer
-    model = LogisticRegression(class_weight='balanced', max_iter=1000) # define the lr model with class weights to take into accound class imbalance
+    # Define TF-IDF + Logistic Regression 
+    vectoriser = TfidfVectorizer(ngram_range=(1, 2), stop_words="english") # define the vectorizer
+    model = LogisticRegression(class_weight='balanced', max_iter=1000) # define the lr model with class weights to take into account class imbalance
 
     # Train model
-    print("Training baseline model...")
-    X_train = vectorizer.fit_transform(train_texts) # vectorise the train texts
-    X_test = vectorizer.transform(test_texts) # vectorise the test texts
+    X_train = vectoriser.fit_transform(train_texts) # vectorise the train texts
+    X_test = vectoriser.transform(test_texts) # vectorise the test texts
 
     start_time = time.time() # take the time before the training begins
     model.fit(X_train, train_labels) # fit the model
     training_time = time.time() - start_time # work out how long the model was training for
-    print(f"Training complete in {training_time:.2f} seconds.") # print out how long the model was training for
 
-    # make predictions
+    # Make predictions
     preds = model.predict(X_test)
     probs = model.predict_proba(X_test)  # probabilities for AUC
 
-    # Metrics and examples
+    # Compute metrics
     acc = accuracy_score(test_labels, preds)
     prec_w, rec_w, f1_w, _ = precision_recall_fscore_support(test_labels, preds, average="weighted", zero_division=0)
     prec_m, rec_m, f1_m, _ = precision_recall_fscore_support(test_labels, preds, average="macro", zero_division=0)
     report = classification_report(test_labels, preds, output_dict=True, zero_division=0)
     cm = confusion_matrix(test_labels, preds)
 
-    # Compute AUC-ROC
-    try:
-        y_true_bin = label_binarize(test_labels, classes=[0, 1, 2]) # converts class labels into one-hot vector
-        roc_auc = {}
-        label_names = ["negative", "neutral", "positive"]
+    y_true_bin = label_binarize(test_labels, classes=[0, 1, 2]) # converts class labels into one-hot vector
+    roc_auc = {}
+    label_names = ["negative", "neutral", "positive"]
 
-        for i, name in enumerate(label_names): # loop through each sentiment class
-            roc_auc[name] = roc_auc_score(y_true_bin[:, i], probs[:, i]) # calcuate auc score
+    for i, name in enumerate(label_names): # loop through each sentiment class
+        roc_auc[name] = roc_auc_score(y_true_bin[:, i], probs[:, i]) # calcuate auc score
 
-        roc_auc["macro"] = roc_auc_score(y_true_bin, probs, average="macro") # computes macro/overall auc score
-        roc_auc["weighted"] = roc_auc_score(y_true_bin, probs, average="weighted") # computes weighted auc score
-
-    except Exception as e:
-        roc_auc = {"error": str(e)} # if auc fails for a class not present, log the error
-
+    roc_auc["macro"] = roc_auc_score(y_true_bin, probs, average="macro") # computes macro/overall auc score
+    roc_auc["weighted"] = roc_auc_score(y_true_bin, probs, average="weighted") # computes weighted auc score
+   
+    # Collect example predictions
     label_names = ["negative", "neutral", "positive"]
     example_tracker = {"correct": {}, "wrong": {}}
 
@@ -133,21 +124,20 @@ def train_baseline_tfidf_lr(save_path="../results/saved_models/tfidf_lr.pkl"):
         "precision_macro": prec_m,
         "recall_macro": rec_m,
         "f1_macro": f1_m,
-        "roc_auc": roc_auc, # include per-class and macro AUCs
+        "roc_auc": roc_auc,
         "report": report,
         "confusion_matrix": cm.tolist(),
         "examples": example_tracker
     }
 
     # Save model and vectorizer
-    joblib.dump({"model": model, "vectorizer": vectorizer}, save_path) # save the model and the vectorisers
+    joblib.dump({"model": model, "vectorizer": vectoriser}, save_path) # save the model and the vectorisers
     print(f"Model saved to {save_path}")
 
-    # Save metrics using your project utility
+    # Save metrics 
     save_metrics_and_history(results, history=None, training_time=training_time) # save the model and results in the .json
 
-    print("Baseline complete.")
-    print(f"Accuracy: {acc:.4f} | F1_w: {f1_w:.4f} | F1_m: {f1_m:.4f}")
+    print(f"Accuracy: {acc:.4f} | F1_w: {f1_w:.4f} | F1_m: {f1_m:.4f}") # print out key metrics
 
     return results # return the results
 

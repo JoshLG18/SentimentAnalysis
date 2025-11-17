@@ -96,17 +96,14 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
     cm = confusion_matrix(all_labels, all_preds)
 
     # Compute AUC-ROC
-    try:
-        y_true_bin = label_binarize(all_labels, classes=[0, 1, 2]) # converts class labels into one-hot vector
-        roc_auc = {}
-        for i, name in enumerate(label_names): # loop through each sentiment class
-            roc_auc[name] = roc_auc_score(y_true_bin[:, i], all_probs[:, i]) # calcuate auc score
+    y_true_bin = label_binarize(all_labels, classes=[0, 1, 2]) # converts class labels into one-hot vector
+    roc_auc = {}
+    for i, name in enumerate(label_names): # loop through each sentiment class
+        roc_auc[name] = roc_auc_score(y_true_bin[:, i], all_probs[:, i]) # calcuate auc score
 
-        roc_auc["macro"] = roc_auc_score(y_true_bin, all_probs, average="macro") # computes macro/overall auc score
+    roc_auc["macro"] = roc_auc_score(y_true_bin, all_probs, average="macro") # computes macro/overall auc score
 
-    except Exception as e:
-        roc_auc = {"error": str(e)} # if auc fails for a class not present, log the error
-
+    # collect example predictions
     example_tracker = {"correct": {}, "wrong": {}} # create a dictionary to store correct and wrong examples
 
     # loop through each pair of test text, label and prediction
@@ -133,6 +130,7 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
         for cls in example_tracker[category]:
             example_tracker[category][cls] = example_tracker[category][cls][:3]  # keep up to 3 examples
 
+    # store all the results
     results = { # create a dictionary containing all of the results
         "loss": total_loss / len(dataloader),
         "accuracy": acc,
@@ -204,7 +202,7 @@ def train_model(save_path, model, train_loader, val_loader, optimiser, scheduler
         else:
             patience_counter += 1 # if the better model isn't found increaase patience counter
             if patience_counter >= patience: # if patients is reached early stop
-                print("⏹ Early stopping triggered")
+                print("Early stopping triggered")
                 break
 
     model.load_state_dict(torch.load(save_path)) # save the best model

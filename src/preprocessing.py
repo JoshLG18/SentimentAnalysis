@@ -5,9 +5,6 @@ from transformers import AutoTokenizer, DataCollatorWithPadding
 from torch.utils.data import DataLoader
 from utils import BATCH_SIZE
 import re
-import numpy as np
-from sklearn.utils.class_weight import compute_class_weight
-from utils import DEVICE
 
 # Constants
 MODEL_NAME = "ProsusAI/finbert" # defines the finbert model used
@@ -45,12 +42,12 @@ def prepare_data(test_size=0.2, random_state=123):
     train_ds = Dataset.from_pandas(train_df) # converts the pandas dfs into huggingface
     test_ds = Dataset.from_pandas(test_df) # converts the pandas dfs into huggingface
 
-    # Tokenisation
+    # define a tokenization function to be mapped onto the datasets
     def tokenize(example):
         return tokenizer(example["text"], truncation=True, padding=False,max_length=64)
 
-    train_ds = train_ds.map(tokenize, batched=True) # tokenises the dataset using finbert
-    test_ds = test_ds.map(tokenize, batched=True) # tokenises the dataset using finbert
+    train_ds = train_ds.map(tokenize, batched=True) # tokenises the dataset using finbert - mapping all words into embeddings 
+    test_ds = test_ds.map(tokenize, batched=True) # tokenises the dataset using finbert - mapping all words into embeddings 
 
     # converts the hugging face datasets into tensors
     train_ds.set_format(type="torch", columns=["input_ids", "attention_mask", "label"]) 
