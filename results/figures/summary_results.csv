@@ -1,0 +1,11 @@
+Metric,Logistic Regression,MLP,LSTM,Transformer
+Accuracy,0.854,0.882,0.897,0.903
+Precision (Weighted),0.859,0.882,0.897,0.903
+Recall (Weighted),0.854,0.882,0.897,0.903
+F1 (Weighted),0.856,0.882,0.897,0.903
+Precision (Macro),0.802,0.863,0.877,0.88
+Recall (Macro),0.828,0.845,0.866,0.874
+F1 (Macro),0.814,0.853,0.871,0.876
+ROC-AUC (Macro),0.942,0.962,0.966,0.969
+Loss,,0.542,0.5,0.493
+Training Time (min),0.057,32.578,32.602,35.226

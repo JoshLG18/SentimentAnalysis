@@ -1,679 +1,1081 @@
 {
     "train_LSTM": {
-        "timestamp": "2025-10-17 18:16:13",
-        "training_time": 1458.8498821258545,
+        "timestamp": "2025-10-18 14:15:07",
+        "training_time": 1956.1013114452362,
         "best_metrics": {
-            "loss": 0.500581965376349,
-            "accuracy": 0.891324369128753,
-            "precision_weighted": 0.8905478373829873,
-            "recall_weighted": 0.891324369128753,
-            "f1_weighted": 0.8907829224497591,
-            "precision_macro": 0.8705116302379946,
-            "recall_macro": 0.8552591937863716,
-            "f1_macro": 0.86261806762646,
+            "loss": 0.5001593996496762,
+            "accuracy": 0.8974028366181617,
+            "precision_weighted": 0.8968922914561616,
+            "recall_weighted": 0.8974028366181617,
+            "f1_weighted": 0.8969175519140611,
+            "precision_macro": 0.8765178684597489,
+            "recall_macro": 0.8662313210832023,
+            "f1_macro": 0.8711251171331013,
             "report": {
                 "negative": {
-                    "precision": 0.8375394321766562,
-                    "recall": 0.7925373134328358,
-                    "f1-score": 0.8144171779141104,
+                    "precision": 0.8318318318318318,
+                    "recall": 0.826865671641791,
+                    "f1-score": 0.8293413173652695,
                     "support": 670.0
                 },
                 "neutral": {
-                    "precision": 0.9129050925925926,
-                    "recall": 0.9304040106163374,
-                    "f1-score": 0.9215714911640135,
+                    "precision": 0.9157773291029708,
+                    "recall": 0.9363019758183426,
+                    "f1-score": 0.9259259259259259,
                     "support": 3391.0
                 },
                 "positive": {
-                    "precision": 0.8610903659447349,
-                    "recall": 0.8428362573099415,
-                    "f1-score": 0.851865533801256,
+                    "precision": 0.8819444444444444,
+                    "recall": 0.8355263157894737,
+                    "f1-score": 0.8581081081081081,
                     "support": 1368.0
                 },
-                "accuracy": 0.891324369128753,
+                "accuracy": 0.8974028366181617,
                 "macro avg": {
-                    "precision": 0.8705116302379946,
-                    "recall": 0.8552591937863716,
-                    "f1-score": 0.86261806762646,
+                    "precision": 0.8765178684597489,
+                    "recall": 0.8662313210832023,
+                    "f1-score": 0.8711251171331013,
                     "support": 5429.0
                 },
                 "weighted avg": {
-                    "precision": 0.8905478373829873,
-                    "recall": 0.891324369128753,
-                    "f1-score": 0.8907829224497591,
+                    "precision": 0.8968922914561616,
+                    "recall": 0.8974028366181617,
+                    "f1-score": 0.8969175519140611,
                     "support": 5429.0
                 }
             },
             "confusion_matrix": [
                 [
-                    531,
-                    111,
-                    28
+                    554,
+                    97,
+                    19
                 ],
                 [
-                    78,
-                    3155,
-                    158
+                    82,
+                    3175,
+                    134
                 ],
                 [
-                    25,
-                    190,
-                    1153
+                    30,
+                    195,
+                    1143
                 ]
             ],
             "examples": {
                 "correct": {
-                    "neutral": {
-                        "text": "nike sets strategy in south america",
-                        "true": "neutral",
-                        "pred": "neutral"
-                    },
-                    "negative": {
-                        "text": "finnish technology company raute corporation ( omx helsinki : rutav ) issued on tuesday ( 23 september ) a profit warning for the financial year 2008.",
-                        "true": "negative",
-                        "pred": "negative"
-                    },
-                    "positive": {
-                        "text": "in january, traffic, measured in revenue passenger kilometres rpk, went up by 3. 2 % and capacity, measured in available seat kilometres ask, rose by 12. 2 %.",
-                        "true": "positive",
-                        "pred": "positive"
-                    }
+                    "neutral": [
+                        {
+                            "text": "Nike sets strategy in South America",
+                            "true": "neutral",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "The start of the negotiations , relating to Glaston 's efficiency program , was announced in October .",
+                            "true": "neutral",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "2020 the year investors fall in love with stocks again?",
+                            "true": "neutral",
+                            "pred": "neutral"
+                        }
+                    ],
+                    "negative": [
+                        {
+                            "text": "Finnish technology company Raute Corporation issued on Tuesday a profit warning for the financial year 2008 .",
+                            "true": "negative",
+                            "pred": "negative"
+                        },
+                        {
+                            "text": "Tullow Oil diminishing reserves",
+                            "true": "negative",
+                            "pred": "negative"
+                        },
+                        {
+                            "text": "Samsung currently occupies third place and lost ground during the quarter , dropping by 1.8 to an 11.1 share overall .",
+                            "true": "negative",
+                            "pred": "negative"
+                        }
+                    ],
+                    "positive": [
+                        {
+                            "text": "In January , traffic , measured in revenue passenger kilometres RPK , went up by 3.2 and capacity , measured in available seat kilometres ASK , rose by 12.2 .",
+                            "true": "positive",
+                            "pred": "positive"
+                        },
+                        {
+                            "text": "The acquisition of Elektros Pavara completes KONE 's market expansion strategy in the Baltic Countries .",
+                            "true": "positive",
+                            "pred": "positive"
+                        },
+                        {
+                            "text": "Adjusted for changes in the Group structure , the Division 's net sales increased by 1.7 .",
+                            "true": "positive",
+                            "pred": "positive"
+                        }
+                    ]
                 },
                 "wrong": {
-                    "positive": {
-                        "text": "ramirent is a leading company in machinery and equipment rentals for construction and industry.",
-                        "true": "positive",
-                        "pred": "neutral"
-                    },
-                    "negative": {
-                        "text": "tullow oil : diminishing reserves https : / / t. co / k73we7kypl",
-                        "true": "negative",
-                        "pred": "neutral"
-                    },
-                    "neutral": {
-                        "text": "the goal is significant expansion in finland and in the northern baltic region.",
-                        "true": "neutral",
-                        "pred": "positive"
-                    }
+                    "positive": [
+                        {
+                            "text": "Ramirent is a leading company in machinery and equipment rentals for construction and industry .",
+                            "true": "positive",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "ECONX December University of Michigan Consumer Sentiment Prelim 99.2 vs 96.5 consensus??",
+                            "true": "positive",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "BAM 3 Reasons Brookfield Is A MustOwn DividendGrowth Stock. Get more info on Seeking Alpha??",
+                            "true": "positive",
+                            "pred": "neutral"
+                        }
+                    ],
+                    "neutral": [
+                        {
+                            "text": "The goal is significant expansion in Finland and in the northern Baltic region .",
+                            "true": "neutral",
+                            "pred": "positive"
+                        },
+                        {
+                            "text": "Volatility still remains near alltime lows across some major currency pairs, including the euro versus the dollar,??",
+                            "true": "neutral",
+                            "pred": "negative"
+                        },
+                        {
+                            "text": "SINT familiar name. Loading zone. Worth a trade again. There is a gap to fill.",
+                            "true": "neutral",
+                            "pred": "positive"
+                        }
+                    ],
+                    "negative": [
+                        {
+                            "text": "BXC Form S3 BlueLinx Holdings Inc.",
+                            "true": "negative",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "The largest hedge fund in the world has reportedly staked more than 1 billion that global equity markets will fall??",
+                            "true": "negative",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "The offer , deemed too low by Finnlines ' board , stands until 4 pm tomorrow .",
+                            "true": "negative",
+                            "pred": "neutral"
+                        }
+                    ]
                 }
             },
             "roc_auc": {
-                "negative": 0.9732064619119156,
-                "neutral": 0.9570865151620827,
-                "positive": 0.9605448561484151,
-                "macro": 0.9636126110741378
+                "negative": 0.9721536256519463,
+                "neutral": 0.9613467676517156,
+                "positive": 0.9650354030854036,
+                "macro": 0.9661785987963553
             },
-            "train_loss": 0.43929420832325433
+            "train_loss": 0.4030301895211725
         },
         "history": {
             "train_loss": [
-                0.6049474625903017,
-                0.5555273088462213,
-                0.5282648541471537,
-                0.511427900019814,
-                0.49331730683060254,
-                0.4788664901081254,
-                0.46716486662626266,
-                0.43929420832325433,
-                0.42908199762596805,
-                0.4215170169577879,
-                0.41061004671980356,
-                0.39764812080299156,
-                0.3922968346406432
+                0.6028925476705327,
+                0.5586906266563079,
+                0.5327382611001239,
+                0.5146952793002129,
+                0.5031217622406342,
+                0.4895205269841587,
+                0.47473073785795883,
+                0.4621072845423923,
+                0.4495626535485773,
+                0.4372509348041871,
+                0.42620863835601247,
+                0.4030301895211725,
+                0.3928756698089487,
+                0.38715469898546445,
+                0.38138337564818997,
+                0.36685067248695036,
+                0.3638145421357716
             ],
             "val_loss": [
-                0.5506973305169274,
-                0.5308614068171558,
-                0.5167128769790426,
-                0.5143912185640896,
-                0.5170374768621782,
-                0.5193332805353053,
-                0.5210552864214953,
-                0.500581965376349,
-                0.512932300567627,
-                0.517083935176625,
-                0.5158629743491903,
-                0.5152291084037107,
-                0.5245256792096531
+                0.5565675647819743,
+                0.5322957694530487,
+                0.5248626098913305,
+                0.5147639989852906,
+                0.5378056592801038,
+                0.5089734242242925,
+                0.5047883461503422,
+                0.5004826570258422,
+                0.5120184246231528,
+                0.5041900073780733,
+                0.5152647751219133,
+                0.5001593996496762,
+                0.5111113688525032,
+                0.5176069368334377,
+                0.5130049561752993,
+                0.5128320546711193,
+                0.5197250278557048
             ],
             "accuracy": [
-                0.8561429360839934,
-                0.8668263031865905,
-                0.8745625345367471,
-                0.8778780622582427,
-                0.8787990421808805,
-                0.8736415546141094,
-                0.8806410020261558,
-                0.891324369128753,
-                0.8869036655000921,
-                0.8835881377785965,
-                0.8902191932215878,
-                0.8885614293608399,
-                0.8857984895929268
+                0.8506170565481672,
+                0.866642107202063,
+                0.8714312027997789,
+                0.8769570823356051,
+                0.8587216798673789,
+                0.8834039417940689,
+                0.8915085651132806,
+                0.8900349972370603,
+                0.8852459016393442,
+                0.8939031129121385,
+                0.8905875851906428,
+                0.8974028366181617,
+                0.8997973844170197,
+                0.8922453490513906,
+                0.8920611530668632,
+                0.8948240928347762,
+                0.8955608767728863
             ],
             "precision_weighted": [
-                0.856071016353632,
-                0.8680072848290832,
-                0.8739831794341625,
-                0.8788023756258687,
-                0.8812062981149507,
-                0.8752512316985299,
-                0.8805813028398257,
-                0.8905478373829873,
-                0.8869746758238375,
-                0.8843243740911908,
-                0.8893199007821309,
-                0.8880892774468728,
-                0.8870579250607478
+                0.8512986735108836,
+                0.8671396909075508,
+                0.8712169922330188,
+                0.8761469508891699,
+                0.868855715372595,
+                0.8829904140911133,
+                0.8907985227850918,
+                0.8893410549676971,
+                0.8851824984775715,
+                0.8930733912387268,
+                0.8901433196479404,
+                0.8968922914561616,
+                0.8989310969597912,
+                0.8937615954992231,
+                0.8936236550585839,
+                0.8942729922390287,
+                0.8948579697062861
             ],
             "recall_weighted": [
-                0.8561429360839934,
-                0.8668263031865905,
-                0.8745625345367471,
-                0.8778780622582427,
-                0.8787990421808805,
-                0.8736415546141094,
-                0.8806410020261558,
-                0.891324369128753,
-                0.8869036655000921,
-                0.8835881377785965,
-                0.8902191932215878,
-                0.8885614293608399,
-                0.8857984895929268
+                0.8506170565481672,
+                0.866642107202063,
+                0.8714312027997789,
+                0.8769570823356051,
+                0.8587216798673789,
+                0.8834039417940689,
+                0.8915085651132806,
+                0.8900349972370603,
+                0.8852459016393442,
+                0.8939031129121385,
+                0.8905875851906428,
+                0.8974028366181617,
+                0.8997973844170197,
+                0.8922453490513906,
+                0.8920611530668632,
+                0.8948240928347762,
+                0.8955608767728863
             ],
             "f1_weighted": [
-                0.8553246589416849,
-                0.8671754940255305,
-                0.8739728040166284,
-                0.8780536325371527,
-                0.8794883268356393,
-                0.8706513099898283,
-                0.8782569246663037,
-                0.8907829224497591,
-                0.8864351979900958,
-                0.8833603567262786,
-                0.8895594857217687,
-                0.8882921902205894,
-                0.8863111332816158
+                0.8493825144701006,
+                0.8665810637769574,
+                0.8710643027628396,
+                0.8764134700443755,
+                0.8610237575111666,
+                0.8814680256147008,
+                0.890644843756138,
+                0.8886104637487994,
+                0.8852013844639357,
+                0.8932994389387529,
+                0.8897343012612448,
+                0.8969175519140611,
+                0.8990426349395509,
+                0.891707210843391,
+                0.8916624012019397,
+                0.8943871704126097,
+                0.8944743298972136
             ]
         }
     },
     "train_MLP": {
-        "timestamp": "2025-10-17 17:51:33",
-        "training_time": 2220.4055025577545,
+        "timestamp": "2025-10-18 13:42:09",
+        "training_time": 1954.7075657844543,
         "best_metrics": {
-            "loss": 0.546304150539286,
-            "accuracy": 0.8822987658869037,
-            "precision_weighted": 0.8814413886506509,
-            "recall_weighted": 0.8822987658869037,
-            "f1_weighted": 0.8810680592689485,
-            "precision_macro": 0.8623396648083648,
-            "recall_macro": 0.8393600429339468,
-            "f1_macro": 0.849962585255486,
+            "loss": 0.5416570533724392,
+            "accuracy": 0.8824829618714312,
+            "precision_weighted": 0.8818632104749691,
+            "recall_weighted": 0.8824829618714312,
+            "f1_weighted": 0.8819556551000779,
+            "precision_macro": 0.8626880982052781,
+            "recall_macro": 0.8447327083302284,
+            "f1_macro": 0.8531977365375333,
             "report": {
                 "negative": {
-                    "precision": 0.8148148148148148,
-                    "recall": 0.7880597014925373,
-                    "f1-score": 0.8012139605462822,
+                    "precision": 0.8439024390243902,
+                    "recall": 0.7746268656716417,
+                    "f1-score": 0.8077821011673152,
                     "support": 670.0
                 },
                 "neutral": {
-                    "precision": 0.8972041796102795,
-                    "recall": 0.9368917723385431,
-                    "f1-score": 0.9166185804962492,
+                    "precision": 0.9076655052264808,
+                    "recall": 0.9218519610734297,
+                    "f1-score": 0.9147037307973664,
                     "support": 3391.0
                 },
                 "positive": {
-                    "precision": 0.875,
-                    "recall": 0.7931286549707602,
-                    "f1-score": 0.8320552147239264,
+                    "precision": 0.8364963503649635,
+                    "recall": 0.8377192982456141,
+                    "f1-score": 0.8371073776479182,
                     "support": 1368.0
                 },
-                "accuracy": 0.8822987658869037,
+                "accuracy": 0.8824829618714312,
                 "macro avg": {
-                    "precision": 0.8623396648083648,
-                    "recall": 0.8393600429339468,
-                    "f1-score": 0.849962585255486,
+                    "precision": 0.8626880982052781,
+                    "recall": 0.8447327083302284,
+                    "f1-score": 0.8531977365375333,
                     "support": 5429.0
                 },
                 "weighted avg": {
-                    "precision": 0.8814413886506509,
-                    "recall": 0.8822987658869037,
-                    "f1-score": 0.8810680592689485,
+                    "precision": 0.8818632104749691,
+                    "recall": 0.8824829618714312,
+                    "f1-score": 0.8819556551000779,
                     "support": 5429.0
                 }
             },
             "confusion_matrix": [
                 [
-                    528,
-                    120,
-                    22
+                    519,
+                    127,
+                    24
                 ],
                 [
-                    81,
-                    3177,
-                    133
+                    65,
+                    3126,
+                    200
                 ],
                 [
-                    39,
-                    244,
-                    1085
+                    31,
+                    191,
+                    1146
                 ]
             ],
             "examples": {
                 "correct": {
-                    "neutral": {
-                        "text": "nike sets strategy in south america",
-                        "true": "neutral",
-                        "pred": "neutral"
-                    },
-                    "negative": {
-                        "text": "finnish technology company raute corporation ( omx helsinki : rutav ) issued on tuesday ( 23 september ) a profit warning for the financial year 2008.",
-                        "true": "negative",
-                        "pred": "negative"
-                    },
-                    "positive": {
-                        "text": "in january, traffic, measured in revenue passenger kilometres rpk, went up by 3. 2 % and capacity, measured in available seat kilometres ask, rose by 12. 2 %.",
-                        "true": "positive",
-                        "pred": "positive"
-                    }
+                    "neutral": [
+                        {
+                            "text": "Nike sets strategy in South America",
+                            "true": "neutral",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "The start of the negotiations , relating to Glaston 's efficiency program , was announced in October .",
+                            "true": "neutral",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "2020 the year investors fall in love with stocks again?",
+                            "true": "neutral",
+                            "pred": "neutral"
+                        }
+                    ],
+                    "negative": [
+                        {
+                            "text": "Finnish technology company Raute Corporation issued on Tuesday a profit warning for the financial year 2008 .",
+                            "true": "negative",
+                            "pred": "negative"
+                        },
+                        {
+                            "text": "Tullow Oil diminishing reserves",
+                            "true": "negative",
+                            "pred": "negative"
+                        },
+                        {
+                            "text": "Samsung currently occupies third place and lost ground during the quarter , dropping by 1.8 to an 11.1 share overall .",
+                            "true": "negative",
+                            "pred": "negative"
+                        }
+                    ],
+                    "positive": [
+                        {
+                            "text": "In January , traffic , measured in revenue passenger kilometres RPK , went up by 3.2 and capacity , measured in available seat kilometres ASK , rose by 12.2 .",
+                            "true": "positive",
+                            "pred": "positive"
+                        },
+                        {
+                            "text": "The acquisition of Elektros Pavara completes KONE 's market expansion strategy in the Baltic Countries .",
+                            "true": "positive",
+                            "pred": "positive"
+                        },
+                        {
+                            "text": "Adjusted for changes in the Group structure , the Division 's net sales increased by 1.7 .",
+                            "true": "positive",
+                            "pred": "positive"
+                        }
+                    ]
                 },
                 "wrong": {
-                    "positive": {
-                        "text": "ramirent is a leading company in machinery and equipment rentals for construction and industry.",
-                        "true": "positive",
-                        "pred": "neutral"
-                    },
-                    "negative": {
-                        "text": "tullow oil : diminishing reserves https : / / t. co / k73we7kypl",
-                        "true": "negative",
-                        "pred": "neutral"
-                    },
-                    "neutral": {
-                        "text": "the goal is significant expansion in finland and in the northern baltic region.",
-                        "true": "neutral",
-                        "pred": "positive"
-                    }
+                    "positive": [
+                        {
+                            "text": "Ramirent is a leading company in machinery and equipment rentals for construction and industry .",
+                            "true": "positive",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "ECONX December University of Michigan Consumer Sentiment Prelim 99.2 vs 96.5 consensus??",
+                            "true": "positive",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "BAM 3 Reasons Brookfield Is A MustOwn DividendGrowth Stock. Get more info on Seeking Alpha??",
+                            "true": "positive",
+                            "pred": "neutral"
+                        }
+                    ],
+                    "neutral": [
+                        {
+                            "text": "The goal is significant expansion in Finland and in the northern Baltic region .",
+                            "true": "neutral",
+                            "pred": "positive"
+                        },
+                        {
+                            "text": "Solaris Outlines Broad Porphyry Deposit in First FollowUp Holes at Warintza West Discovery VANCOUVER, British Columbia, Oct. 13, 2022 Solaris Resources Inc. ??laris??or ??e Company?? is pleased to report assay results from the first series of holes following up on the discovery of Warintza West within its Warintza Project ??rintza??or ??e Project?? in southeastern Ecuador. Highlights are listed below, with a corresponding image in Figure 1 and detailed results in Tables 12.",
+                            "true": "neutral",
+                            "pred": "positive"
+                        },
+                        {
+                            "text": "Deluxe Reports Fourth Quarter 2019 Results and Record Full Year Revenue",
+                            "true": "neutral",
+                            "pred": "positive"
+                        }
+                    ],
+                    "negative": [
+                        {
+                            "text": "BXC Form S3 BlueLinx Holdings Inc.",
+                            "true": "negative",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "The largest hedge fund in the world has reportedly staked more than 1 billion that global equity markets will fall??",
+                            "true": "negative",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "Stocks face 50 odds of correction in 2020, Vanguard? Davis says",
+                            "true": "negative",
+                            "pred": "neutral"
+                        }
+                    ]
                 }
             },
             "roc_auc": {
-                "negative": 0.969754714554983,
-                "neutral": 0.9534129481462359,
-                "positive": 0.959873803156829,
-                "macro": 0.9610138219526826
+                "negative": 0.971955728815473,
+                "neutral": 0.9537970538535158,
+                "positive": 0.9600032256624489,
+                "macro": 0.9619186694438125
             },
-            "train_loss": 0.500030595239471
+            "train_loss": 0.5006502328550114
         },
         "history": {
             "train_loss": [
-                0.6743605623350424,
-                0.602290994980756,
-                0.5869558626238037,
-                0.5762192167779978,
-                0.5677700733437258,
-                0.5613558356376255,
-                0.5534075189162703,
-                0.5470702504410463,
-                0.5437566557351281,
-                0.5386963832027772,
-                0.5325037562671829,
-                0.5285672926727463,
-                0.5239390835165978,
-                0.5160673768204801,
-                0.5090433124233694,
-                0.5083043281646336,
-                0.5043711895451827,
-                0.500013979480547,
-                0.500030595239471,
-                0.4951755291398834,
-                0.49373735785484313,
-                0.489690887928009,
-                0.48460202506359884,
-                0.48340227603912356
+                0.6691326638354974,
+                0.5986415988382171,
+                0.583493804668679,
+                0.5726719496881261,
+                0.5621852554819163,
+                0.5560048143653309,
+                0.5469569929382381,
+                0.5418999313431627,
+                0.5385310104664635,
+                0.5316510972731253,
+                0.5254822896683917,
+                0.5207056350567761,
+                0.5161603587515214,
+                0.5116281157030779,
+                0.5039874002337456,
+                0.5006502328550114,
+                0.4986749429913128,
+                0.4921173732070362,
+                0.48737649488098483,
+                0.47738050546716243,
+                0.4727383563623709
             ],
             "val_loss": [
-                0.619583852150861,
-                0.6067672747022965,
-                0.5782063003848581,
-                0.5824814638670753,
-                0.5707315297687755,
-                0.5716747774797327,
-                0.5665703689350802,
-                0.561492374013452,
-                0.559748189238941,
-                0.551433860203799,
-                0.5546982645988464,
-                0.5601611845633563,
-                0.564298045985839,
-                0.5488756404203528,
-                0.5481182470041163,
-                0.5475885328124551,
-                0.5490618330590865,
-                0.5480759280569413,
-                0.546304150539286,
-                0.5482226673294516,
-                0.5518752669586855,
-                0.5493454095195321,
-                0.5544546348207137,
-                0.5488029690349803
+                0.6098825230317957,
+                0.5976459832752452,
+                0.5761222208247465,
+                0.5830388914136325,
+                0.5690645459820243,
+                0.5683877078925862,
+                0.5557703905245837,
+                0.5531895963584675,
+                0.5550360763774199,
+                0.5540927431162666,
+                0.5530781248036553,
+                0.5493821350967183,
+                0.5428486557567821,
+                0.5488032281398774,
+                0.5422411154298221,
+                0.5416570533724392,
+                0.5540601435829612,
+                0.5420578795320847,
+                0.5472325605504653,
+                0.5426448709824506,
+                0.5479752112837398
             ],
             "accuracy": [
-                0.8386443175538774,
-                0.8404862773991527,
-                0.8467489408730889,
-                0.8565113280530484,
-                0.856695524037576,
-                0.8589058758519065,
-                0.8653527353103703,
-                0.868668263031866,
-                0.8631423834960398,
-                0.8649843433413151,
-                0.8717995947688341,
-                0.874194142567692,
-                0.869036655000921,
-                0.8780622582427703,
-                0.8778780622582427,
-                0.8776938662737153,
-                0.8791674341499355,
-                0.8797200221035182,
-                0.8822987658869037,
-                0.8826671578559587,
-                0.8839565297476515,
+                0.839565297476515,
+                0.8484067047338368,
+                0.8526432123779701,
+                0.8572481119911586,
+                0.8609320316817093,
+                0.8640633634186775,
+                0.8659053232639529,
+                0.8684840670473384,
+                0.8747467305212746,
+                0.8651685393258427,
+                0.8732731626450544,
+                0.8762202983974949,
+                0.8787990421808805,
                 0.8799042180880456,
-                0.8839565297476515,
-                0.8817461779333211
+                0.8808251980106834,
+                0.8824829618714312,
+                0.8752993184748572,
+                0.8834039417940689,
+                0.8824829618714312,
+                0.8909559771596979,
+                0.8905875851906428
             ],
             "precision_weighted": [
-                0.8366486048260636,
-                0.8391634930198656,
-                0.8475684330543153,
-                0.855587652369133,
-                0.855376398726889,
-                0.8573484991445045,
-                0.8645080305280196,
-                0.8677216790868986,
-                0.862511852730424,
-                0.8645865980925043,
-                0.8731657839246595,
-                0.8732125482980844,
-                0.8678256251495735,
-                0.8771697338680298,
-                0.8771476583754184,
-                0.876751335032953,
-                0.8783356973507055,
-                0.879649183180361,
-                0.8814413886506509,
-                0.8822965654467131,
-                0.8832201716914893,
-                0.8804146042313941,
-                0.8829313090416057,
-                0.8810022282483543
+                0.8373970360340549,
+                0.846851057283503,
+                0.8542322192905659,
+                0.8562470327799708,
+                0.8598520922644577,
+                0.8628857133282576,
+                0.865647320857648,
+                0.8675279611502817,
+                0.8742736252873999,
+                0.8677439500953331,
+                0.8756554260254485,
+                0.8749363270526863,
+                0.8779171752216971,
+                0.8791904114350717,
+                0.8806433047809367,
+                0.8818632104749691,
+                0.8768723272703935,
+                0.883555493397571,
+                0.8819059883538409,
+                0.8905498144468749,
+                0.8897289300174083
             ],
             "recall_weighted": [
-                0.8386443175538774,
-                0.8404862773991527,
-                0.8467489408730889,
-                0.8565113280530484,
-                0.856695524037576,
-                0.8589058758519065,
-                0.8653527353103703,
-                0.868668263031866,
-                0.8631423834960398,
-                0.8649843433413151,
-                0.8717995947688341,
-                0.874194142567692,
-                0.869036655000921,
-                0.8780622582427703,
-                0.8778780622582427,
-                0.8776938662737153,
-                0.8791674341499355,
-                0.8797200221035182,
-                0.8822987658869037,
-                0.8826671578559587,
-                0.8839565297476515,
+                0.839565297476515,
+                0.8484067047338368,
+                0.8526432123779701,
+                0.8572481119911586,
+                0.8609320316817093,
+                0.8640633634186775,
+                0.8659053232639529,
+                0.8684840670473384,
+                0.8747467305212746,
+                0.8651685393258427,
+                0.8732731626450544,
+                0.8762202983974949,
+                0.8787990421808805,
                 0.8799042180880456,
-                0.8839565297476515,
-                0.8817461779333211
+                0.8808251980106834,
+                0.8824829618714312,
+                0.8752993184748572,
+                0.8834039417940689,
+                0.8824829618714312,
+                0.8909559771596979,
+                0.8905875851906428
             ],
             "f1_weighted": [
-                0.8352968397580589,
-                0.8371806212932134,
-                0.8469901653104861,
-                0.8546600048433033,
-                0.8554245958385395,
-                0.8574974922714845,
-                0.8648167743390701,
-                0.8680454293683644,
-                0.8608290496888014,
-                0.8647667666322413,
-                0.8706333029668929,
-                0.872482012167796,
-                0.867237329457891,
-                0.8773533180320091,
-                0.877405368797401,
-                0.8770718781962606,
-                0.8785875389668282,
-                0.8796752372222015,
-                0.8810680592689485,
-                0.8823296645704168,
-                0.8831105597615666,
-                0.8801066744247963,
-                0.8829263463676763,
-                0.8812720921531948
+                0.836517625615279,
+                0.8463423875504491,
+                0.8531475579014006,
+                0.8553187468281203,
+                0.860055439259914,
+                0.8626587381559085,
+                0.8653343915803884,
+                0.8677371705506048,
+                0.8739212537793298,
+                0.8660679691386133,
+                0.8735183480067847,
+                0.8748046833520735,
+                0.8781870859954011,
+                0.8793892174052003,
+                0.8801894104835444,
+                0.8819556551000779,
+                0.8758388058994379,
+                0.883477197807166,
+                0.8818285125949478,
+                0.8906882071791246,
+                0.8899027011533731
             ]
         }
     },
     "train_transformer": {
-        "timestamp": "2025-10-11 20:01:50",
-        "training_time": 1038.1237614154816,
+        "timestamp": "2025-10-18 14:50:39",
+        "training_time": 2113.538218975067,
         "best_metrics": {
-            "loss": 0.5980926433030297,
-            "accuracy": 0.8909559771596979,
-            "precision_weighted": 0.8917366749896334,
-            "recall_weighted": 0.8909559771596979,
-            "f1_weighted": 0.8910896854901793,
-            "precision_macro": 0.8601773409103756,
-            "recall_macro": 0.8692867320896195,
-            "f1_macro": 0.8641833897501078,
+            "loss": 0.4934281201923595,
+            "accuracy": 0.9031129121385154,
+            "precision_weighted": 0.9033059103546154,
+            "recall_weighted": 0.9031129121385154,
+            "f1_weighted": 0.9027104046370799,
+            "precision_macro": 0.8798687519197861,
+            "recall_macro": 0.8738869111460844,
+            "f1_macro": 0.8762336691669116,
             "report": {
-                "0": {
-                    "precision": 0.7886740331491713,
-                    "recall": 0.8522388059701492,
-                    "f1-score": 0.8192252510760402,
+                "negative": {
+                    "precision": 0.8146551724137931,
+                    "recall": 0.8462686567164179,
+                    "f1-score": 0.8301610541727672,
                     "support": 670.0
                 },
-                "1": {
-                    "precision": 0.9202002355712603,
-                    "recall": 0.9215570628133294,
-                    "f1-score": 0.920878149403271,
+                "neutral": {
+                    "precision": 0.9202648244099021,
+                    "recall": 0.9427897375405485,
+                    "f1-score": 0.9313911143481427,
                     "support": 3391.0
                 },
-                "2": {
-                    "precision": 0.8716577540106952,
-                    "recall": 0.8340643274853801,
-                    "f1-score": 0.8524467687710123,
+                "positive": {
+                    "precision": 0.9046862589356632,
+                    "recall": 0.8326023391812866,
+                    "f1-score": 0.8671488389798249,
                     "support": 1368.0
                 },
-                "accuracy": 0.8909559771596979,
+                "accuracy": 0.9031129121385154,
                 "macro avg": {
-                    "precision": 0.8601773409103756,
-                    "recall": 0.8692867320896195,
-                    "f1-score": 0.8641833897501078,
+                    "precision": 0.8798687519197861,
+                    "recall": 0.8738869111460844,
+                    "f1-score": 0.8762336691669116,
                     "support": 5429.0
                 },
                 "weighted avg": {
-                    "precision": 0.8917366749896334,
-                    "recall": 0.8909559771596979,
-                    "f1-score": 0.8910896854901793,
-                    "support": 5429.0
-                }
-            },
-            "train_loss": 0.4542315949411953
-        },
-        "history": {
-            "train_loss": [
-                0.579535535766798,
-                0.5279738083481789,
-                0.5050901578629718,
-                0.4861476141740294,
-                0.46982872161795114,
-                0.4542315949411953,
-                0.44357083019088295,
-                0.42763494261923957,
-                0.4160872583880144
-            ],
-            "val_loss": [
-                0.65070159295026,
-                0.628423944641562,
-                0.6058568631901461,
-                0.6213685281136456,
-                0.6459018952706281,
-                0.5980926433030297,
-                0.6109601876314948,
-                0.599919880137724,
-                0.5999559714513667
-            ],
-            "accuracy": [
-                0.867010499171118,
-                0.8705102228771413,
-                0.8863510775465094,
-                0.8756677104439123,
-                0.8635107754650949,
-                0.8909559771596979,
-                0.8880088414072573,
-                0.8839565297476515,
-                0.8885614293608399
-            ],
-            "precision_weighted": [
-                0.8686745347424376,
-                0.8751579876263018,
-                0.8861071694253067,
-                0.8799357898934479,
-                0.8731060303895121,
-                0.8917366749896334,
-                0.8932321422549063,
-                0.8894682613788921,
-                0.8922873104868563
-            ],
-            "recall_weighted": [
-                0.867010499171118,
-                0.8705102228771413,
-                0.8863510775465094,
-                0.8756677104439123,
-                0.8635107754650949,
-                0.8909559771596979,
-                0.8880088414072573,
-                0.8839565297476515,
-                0.8885614293608399
-            ],
-            "f1_weighted": [
-                0.8676385555423783,
-                0.8718919356106565,
-                0.8862137091113289,
-                0.8769816122405427,
-                0.8656252086826279,
-                0.8910896854901793,
-                0.8895067164897563,
-                0.885458484908783,
-                0.8897142782713516
-            ]
-        }
-    },
-    "train_LR": {
-        "timestamp": "2025-10-17 17:14:01",
-        "training_time": 12.505697965621948,
-        "best_metrics": {
-            "accuracy": 0.85190642843986,
-            "precision_weighted": 0.8578033657734739,
-            "recall_weighted": 0.85190642843986,
-            "f1_weighted": 0.8539752056331502,
-            "precision_macro": 0.7972549836800183,
-            "recall_macro": 0.8289921333952215,
-            "f1_macro": 0.8115008891874252,
-            "report": {
-                "0": {
-                    "precision": 0.6765083440308087,
-                    "recall": 0.7865671641791044,
-                    "f1-score": 0.7273982056590752,
-                    "support": 670.0
-                },
-                "1": {
-                    "precision": 0.9180834621329211,
-                    "recall": 0.8758478324977883,
-                    "f1-score": 0.896468457591307,
-                    "support": 3391.0
-                },
-                "2": {
-                    "precision": 0.7971731448763251,
-                    "recall": 0.8245614035087719,
-                    "f1-score": 0.8106360043118936,
-                    "support": 1368.0
-                },
-                "accuracy": 0.85190642843986,
-                "macro avg": {
-                    "precision": 0.7972549836800183,
-                    "recall": 0.8289921333952215,
-                    "f1-score": 0.8115008891874252,
-                    "support": 5429.0
-                },
-                "weighted avg": {
-                    "precision": 0.8578033657734739,
-                    "recall": 0.85190642843986,
-                    "f1-score": 0.8539752056331502,
+                    "precision": 0.9033059103546154,
+                    "recall": 0.9031129121385154,
+                    "f1-score": 0.9027104046370799,
                     "support": 5429.0
                 }
             },
             "confusion_matrix": [
                 [
-                    527,
-                    96,
-                    47
+                    567,
+                    82,
+                    21
                 ],
                 [
-                    181,
-                    2970,
-                    240
+                    95,
+                    3197,
+                    99
                 ],
                 [
-                    71,
-                    169,
-                    1128
+                    34,
+                    195,
+                    1139
                 ]
             ],
             "examples": {
                 "correct": {
-                    "neutral": {
-                        "text": "Nike sets strategy in South America",
-                        "true": "neutral",
-                        "pred": "neutral"
-                    },
-                    "positive": {
-                        "text": "Ramirent is a leading company in machinery and equipment rentals for construction and industry .",
-                        "true": "positive",
-                        "pred": "positive"
-                    },
-                    "negative": {
-                        "text": "Finnish technology company Raute Corporation ( OMX Helsinki : RUTAV ) issued on Tuesday ( 23 September ) a profit warning for the financial year 2008 .",
-                        "true": "negative",
-                        "pred": "negative"
-                    }
+                    "neutral": [
+                        {
+                            "text": "Nike sets strategy in South America",
+                            "true": "neutral",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "The start of the negotiations , relating to Glaston 's efficiency program , was announced in October .",
+                            "true": "neutral",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "2020 the year investors fall in love with stocks again?",
+                            "true": "neutral",
+                            "pred": "neutral"
+                        }
+                    ],
+                    "negative": [
+                        {
+                            "text": "Finnish technology company Raute Corporation issued on Tuesday a profit warning for the financial year 2008 .",
+                            "true": "negative",
+                            "pred": "negative"
+                        },
+                        {
+                            "text": "Samsung currently occupies third place and lost ground during the quarter , dropping by 1.8 to an 11.1 share overall .",
+                            "true": "negative",
+                            "pred": "negative"
+                        },
+                        {
+                            "text": "OPEC slashed forecasts for global oil demand as the coronavirus hits fuel use in China",
+                            "true": "negative",
+                            "pred": "negative"
+                        }
+                    ],
+                    "positive": [
+                        {
+                            "text": "In January , traffic , measured in revenue passenger kilometres RPK , went up by 3.2 and capacity , measured in available seat kilometres ASK , rose by 12.2 .",
+                            "true": "positive",
+                            "pred": "positive"
+                        },
+                        {
+                            "text": "The acquisition of Elektros Pavara completes KONE 's market expansion strategy in the Baltic Countries .",
+                            "true": "positive",
+                            "pred": "positive"
+                        },
+                        {
+                            "text": "Adjusted for changes in the Group structure , the Division 's net sales increased by 1.7 .",
+                            "true": "positive",
+                            "pred": "positive"
+                        }
+                    ]
                 },
                 "wrong": {
-                    "neutral": {
-                        "text": "2020: the year investors fall in love with stocks again?",
-                        "true": "neutral",
-                        "pred": "negative"
-                    },
-                    "positive": {
-                        "text": "The expansion includes the doubling of the floor space and the addition of more lifting capacity and production equipment .",
-                        "true": "positive",
-                        "pred": "neutral"
-                    },
-                    "negative": {
-                        "text": "$BXC (-3.5% pre) Form S-3 BlueLinx Holdings Inc. https://t.co/3hpRHqTF4a",
-                        "true": "negative",
-                        "pred": "positive"
-                    }
+                    "positive": [
+                        {
+                            "text": "Ramirent is a leading company in machinery and equipment rentals for construction and industry .",
+                            "true": "positive",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "ECONX December University of Michigan Consumer Sentiment Prelim 99.2 vs 96.5 consensus??",
+                            "true": "positive",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "TENB Cowen sees upside in TENB's Indegy purchase",
+                            "true": "positive",
+                            "pred": "neutral"
+                        }
+                    ],
+                    "negative": [
+                        {
+                            "text": "Tullow Oil diminishing reserves",
+                            "true": "negative",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "BXC Form S3 BlueLinx Holdings Inc.",
+                            "true": "negative",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "The offer , deemed too low by Finnlines ' board , stands until 4 pm tomorrow .",
+                            "true": "negative",
+                            "pred": "neutral"
+                        }
+                    ],
+                    "neutral": [
+                        {
+                            "text": "The goal is significant expansion in Finland and in the northern Baltic region .",
+                            "true": "neutral",
+                            "pred": "positive"
+                        },
+                        {
+                            "text": "Volatility still remains near alltime lows across some major currency pairs, including the euro versus the dollar,??",
+                            "true": "neutral",
+                            "pred": "negative"
+                        },
+                        {
+                            "text": "SINT familiar name. Loading zone. Worth a trade again. There is a gap to fill.",
+                            "true": "neutral",
+                            "pred": "positive"
+                        }
+                    ]
+                }
+            },
+            "roc_auc": {
+                "negative": 0.9739014530206709,
+                "neutral": 0.9653828077497757,
+                "positive": 0.9680763819587547,
+                "macro": 0.969120214243067
+            },
+            "train_loss": 0.40796809897703284
+        },
+        "history": {
+            "train_loss": [
+                0.5891359206508188,
+                0.5439099701888421,
+                0.5221484534880694,
+                0.504175239713753,
+                0.48742394815472995,
+                0.47215232822824926,
+                0.45430714715929593,
+                0.44119607762378804,
+                0.42991039647775536,
+                0.41911887281081256,
+                0.40796809897703284,
+                0.3997629306772176,
+                0.38632424947093513,
+                0.38567178608740077,
+                0.3627698069986175,
+                0.35302397976903355
+            ],
+            "val_loss": [
+                0.5538869433543261,
+                0.5420821919160731,
+                0.5191261081134572,
+                0.513992306765388,
+                0.5230737854452694,
+                0.5036589468226713,
+                0.5088169928859262,
+                0.5193731188774109,
+                0.4995077858952915,
+                0.5030000591979308,
+                0.4934281201923595,
+                0.4969656807534835,
+                0.5159851821029887,
+                0.5035518839078791,
+                0.5069197149837719,
+                0.49848048651919646
+            ],
+            "accuracy": [
+                0.8528274083624977,
+                0.8664579112175355,
+                0.8775096702891877,
+                0.8870878614846196,
+                0.8764044943820225,
+                0.8935347209430834,
+                0.8876404494382022,
+                0.893718916927611,
+                0.8955608767728863,
+                0.8975870326026892,
+                0.9031129121385154,
+                0.8999815804015473,
+                0.8990606004789096,
+                0.9020077362313501,
+                0.9027445201694603,
+                0.9106649475041444
+            ],
+            "precision_weighted": [
+                0.8601676772791409,
+                0.8727549969438202,
+                0.8776327138153199,
+                0.8869882952771436,
+                0.8815659956826905,
+                0.8929130879933714,
+                0.8938460866348413,
+                0.8949493929770698,
+                0.8961799119671339,
+                0.8986003309817164,
+                0.9033059103546154,
+                0.9021907808519433,
+                0.9016586600386777,
+                0.9031023237333865,
+                0.9039863362313472,
+                0.9106779070762074
+            ],
+            "recall_weighted": [
+                0.8528274083624977,
+                0.8664579112175355,
+                0.8775096702891877,
+                0.8870878614846196,
+                0.8764044943820225,
+                0.8935347209430834,
+                0.8876404494382022,
+                0.893718916927611,
+                0.8955608767728863,
+                0.8975870326026892,
+                0.9031129121385154,
+                0.8999815804015473,
+                0.8990606004789096,
+                0.9020077362313501,
+                0.9027445201694603,
+                0.9106649475041444
+            ],
+            "f1_weighted": [
+                0.8546901090235035,
+                0.8682585859572716,
+                0.8769971135215284,
+                0.8865791343068243,
+                0.8778011333464887,
+                0.8927056939840315,
+                0.8894028456600366,
+                0.8940193987211263,
+                0.8957924622331267,
+                0.8973845701898633,
+                0.9027104046370799,
+                0.9003604994347268,
+                0.8998661595970137,
+                0.9023542343871228,
+                0.9031269615526926,
+                0.9106383383571991
+            ]
+        }
+    },
+    "train_LR": {
+        "timestamp": "2025-10-18 18:33:36",
+        "training_time": 3.39294695854187,
+        "best_metrics": {
+            "accuracy": 0.8541167802541905,
+            "precision_weighted": 0.8587353126399472,
+            "recall_weighted": 0.8541167802541905,
+            "f1_weighted": 0.8557813753574448,
+            "precision_macro": 0.8022808628705619,
+            "recall_macro": 0.828069345122949,
+            "f1_macro": 0.8142284665935565,
+            "roc_auc": {
+                "negative": 0.951709722034919,
+                "neutral": 0.9352621628168312,
+                "positive": 0.9385009093776056,
+                "macro": 0.9418242647431185,
+                "weighted": 0.9381080773446002
+            },
+            "report": {
+                "0": {
+                    "precision": 0.6986486486486486,
+                    "recall": 0.7716417910447761,
+                    "f1-score": 0.7333333333333333,
+                    "support": 670.0
+                },
+                "1": {
+                    "precision": 0.9180277349768875,
+                    "recall": 0.8785019168386906,
+                    "f1-score": 0.8978300180831826,
+                    "support": 3391.0
+                },
+                "2": {
+                    "precision": 0.7901662049861495,
+                    "recall": 0.8340643274853801,
+                    "f1-score": 0.8115220483641536,
+                    "support": 1368.0
+                },
+                "accuracy": 0.8541167802541905,
+                "macro avg": {
+                    "precision": 0.8022808628705619,
+                    "recall": 0.828069345122949,
+                    "f1-score": 0.8142284665935565,
+                    "support": 5429.0
+                },
+                "weighted avg": {
+                    "precision": 0.8587353126399472,
+                    "recall": 0.8541167802541905,
+                    "f1-score": 0.8557813753574448,
+                    "support": 5429.0
+                }
+            },
+            "confusion_matrix": [
+                [
+                    517,
+                    101,
+                    52
+                ],
+                [
+                    161,
+                    2979,
+                    251
+                ],
+                [
+                    62,
+                    165,
+                    1141
+                ]
+            ],
+            "examples": {
+                "correct": {
+                    "neutral": [
+                        {
+                            "text": "Nike sets strategy in South America",
+                            "true": "neutral",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "The start of the negotiations , relating to Glaston 's efficiency program , was announced in October .",
+                            "true": "neutral",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "Aldata said that there are still a number of operational aspects to be defined between it and Microsoft and further details of the product and market initiatives resulting from this agreement will be available at a later date .",
+                            "true": "neutral",
+                            "pred": "neutral"
+                        }
+                    ],
+                    "positive": [
+                        {
+                            "text": "Ramirent is a leading company in machinery and equipment rentals for construction and industry .",
+                            "true": "positive",
+                            "pred": "positive"
+                        },
+                        {
+                            "text": "In January , traffic , measured in revenue passenger kilometres RPK , went up by 3.2 and capacity , measured in available seat kilometres ASK , rose by 12.2 .",
+                            "true": "positive",
+                            "pred": "positive"
+                        },
+                        {
+                            "text": "The acquisition of Elektros Pavara completes KONE 's market expansion strategy in the Baltic Countries .",
+                            "true": "positive",
+                            "pred": "positive"
+                        }
+                    ],
+                    "negative": [
+                        {
+                            "text": "Finnish technology company Raute Corporation issued on Tuesday a profit warning for the financial year 2008 .",
+                            "true": "negative",
+                            "pred": "negative"
+                        },
+                        {
+                            "text": "Tullow Oil diminishing reserves",
+                            "true": "negative",
+                            "pred": "negative"
+                        },
+                        {
+                            "text": "Samsung currently occupies third place and lost ground during the quarter , dropping by 1.8 to an 11.1 share overall .",
+                            "true": "negative",
+                            "pred": "negative"
+                        }
+                    ]
+                },
+                "wrong": {
+                    "neutral": [
+                        {
+                            "text": "2020 the year investors fall in love with stocks again?",
+                            "true": "neutral",
+                            "pred": "negative"
+                        },
+                        {
+                            "text": "The goal is significant expansion in Finland and in the northern Baltic region .",
+                            "true": "neutral",
+                            "pred": "positive"
+                        },
+                        {
+                            "text": "Volatility still remains near alltime lows across some major currency pairs, including the euro versus the dollar,??",
+                            "true": "neutral",
+                            "pred": "negative"
+                        }
+                    ],
+                    "positive": [
+                        {
+                            "text": "The expansion includes the doubling of the floor space and the addition of more lifting capacity and production equipment .",
+                            "true": "positive",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "The growth of net sales in the first half of 2008 has been 28 compared with the first half of 2007 .",
+                            "true": "positive",
+                            "pred": "negative"
+                        },
+                        {
+                            "text": "Through this transaction we are able to participate in developing the industry .",
+                            "true": "positive",
+                            "pred": "neutral"
+                        }
+                    ],
+                    "negative": [
+                        {
+                            "text": "BXC Form S3 BlueLinx Holdings Inc.",
+                            "true": "negative",
+                            "pred": "neutral"
+                        },
+                        {
+                            "text": "Profit before taxes was EUR 4.0 mn , down from EUR 4.9 mn .",
+                            "true": "negative",
+                            "pred": "positive"
+                        },
+                        {
+                            "text": "According to Scanfil , demand for telecommunications network products has fluctuated significantly in the third quarter of 2006 , and the situation is expected to remain unstable for the rest of the year .",
+                            "true": "negative",
+                            "pred": "positive"
+                        }
+                    ]
                 }
             }
         },

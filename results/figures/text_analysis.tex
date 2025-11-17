@@ -1,0 +1,50 @@
+\renewcommand{\arraystretch}{1.6}
+\begin{longtable}{p{1.8cm}p{1.5cm}p{1.8cm}p{1.8cm}p{16.5cm}}
+\caption{Prediction Examples By Model} \label{tab:text_analysis} \\
+\toprule
+\textbf{Model} & \textbf{Type} & \textbf{True} & \textbf{Pred} & \textbf{Text Examples} \\
+\midrule
+\endfirsthead
+
+\multicolumn{5}{c}{\bfseries Table \thetable\ continued from previous page} \\
+\toprule
+\textbf{Model} & \textbf{Type} & \textbf{True} & \textbf{Pred} & \textbf{Text Examples} \\
+\midrule
+\endhead
+
+\midrule
+\multicolumn{5}{r}{\textit{Continued on next page}} \\
+\endfoot
+
+\bottomrule
+\endlastfoot
+LR & Correct & Negative & Negative & Finnish technology company Raute Corporation issued on Tuesday a profit warning for the financial year 2008 .    |   Tullow Oil diminishing reserves    |   Samsung currently occupies third place and lost ground during the quarter , dropping by 1.8 to an 11.1 share overall . \\
+LR & Correct & Neutral & Neutral & Nike sets strategy in South America    |   The start of the negotiations , relating to Glaston 's efficiency program , was announced in October .    |   Aldata said that there are still a number of operational aspects to be defined between it and Microsoft and further details of the product and market initiatives resulting from this agreement will be available at a later date . \\
+LR & Correct & Positive & Positive & Ramirent is a leading company in machinery and equipment rentals for construction and industry .    |   In January , traffic , measured in revenue passenger kilometres RPK , went up by 3.2 and capacity , measured in available seat kilometres ASK , rose by 12.2 .    |   The acquisition of Elektros Pavara completes KONE 's market expansion strategy in the Baltic Countries . \\
+LR & Wrong & Negative & Neutral & BXC Form S3 BlueLinx Holdings Inc. \\
+LR & Wrong & Negative & Positive & Profit before taxes was EUR 4.0 mn , down from EUR 4.9 mn .    |   According to Scanfil , demand for telecommunications network products has fluctuated significantly in the third quarter of 2006 , and the situation is expected to remain unstable for the rest of the year . \\
+LR & Wrong & Neutral & Negative & 2020 the year investors fall in love with stocks again?    |   Volatility still remains near alltime lows across some major currency pairs, including the euro versus the dollar,?? \\
+LR & Wrong & Neutral & Positive & The goal is significant expansion in Finland and in the northern Baltic region . \\
+LR & Wrong & Positive & Negative & The growth of net sales in the first half of 2008 has been 28 compared with the first half of 2007 . \\
+LR & Wrong & Positive & Neutral & The expansion includes the doubling of the floor space and the addition of more lifting capacity and production equipment .    |   Through this transaction we are able to participate in developing the industry . \\
+LSTM & Correct & Negative & Negative & Finnish technology company Raute Corporation issued on Tuesday a profit warning for the financial year 2008 .    |   Tullow Oil diminishing reserves    |   Samsung currently occupies third place and lost ground during the quarter , dropping by 1.8 to an 11.1 share overall . \\
+LSTM & Correct & Neutral & Neutral & Nike sets strategy in South America    |   The start of the negotiations , relating to Glaston 's efficiency program , was announced in October .    |   2020 the year investors fall in love with stocks again? \\
+LSTM & Correct & Positive & Positive & In January , traffic , measured in revenue passenger kilometres RPK , went up by 3.2 and capacity , measured in available seat kilometres ASK , rose by 12.2 .    |   The acquisition of Elektros Pavara completes KONE 's market expansion strategy in the Baltic Countries .    |   Adjusted for changes in the Group structure , the Division 's net sales increased by 1.7 . \\
+LSTM & Wrong & Negative & Neutral & BXC Form S3 BlueLinx Holdings Inc.    |   The largest hedge fund in the world has reportedly staked more than 1 billion that global equity markets will fall??    |   The offer , deemed too low by Finnlines ' board , stands until 4 pm tomorrow . \\
+LSTM & Wrong & Neutral & Negative & Volatility still remains near alltime lows across some major currency pairs, including the euro versus the dollar,?? \\
+LSTM & Wrong & Neutral & Positive & The goal is significant expansion in Finland and in the northern Baltic region .    |   SINT familiar name. Loading zone. Worth a trade again. There is a gap to fill. \\
+LSTM & Wrong & Positive & Neutral & Ramirent is a leading company in machinery and equipment rentals for construction and industry .    |   ECONX December University of Michigan Consumer Sentiment Prelim 99.2 vs 96.5 consensus??    |   BAM 3 Reasons Brookfield Is A MustOwn DividendGrowth Stock. Get more info on Seeking Alpha?? \\
+MLP & Correct & Negative & Negative & Finnish technology company Raute Corporation issued on Tuesday a profit warning for the financial year 2008 .    |   Tullow Oil diminishing reserves    |   Samsung currently occupies third place and lost ground during the quarter , dropping by 1.8 to an 11.1 share overall . \\
+MLP & Correct & Neutral & Neutral & Nike sets strategy in South America    |   The start of the negotiations , relating to Glaston 's efficiency program , was announced in October .    |   2020 the year investors fall in love with stocks again? \\
+MLP & Correct & Positive & Positive & In January , traffic , measured in revenue passenger kilometres RPK , went up by 3.2 and capacity , measured in available seat kilometres ASK , rose by 12.2 .    |   The acquisition of Elektros Pavara completes KONE 's market expansion strategy in the Baltic Countries .    |   Adjusted for changes in the Group structure , the Division 's net sales increased by 1.7 . \\
+MLP & Wrong & Negative & Neutral & BXC Form S3 BlueLinx Holdings Inc.    |   The largest hedge fund in the world has reportedly staked more than 1 billion that global equity markets will fall??    |   Stocks face 50 odds of correction in 2020, Vanguard? Davis says \\
+MLP & Wrong & Neutral & Positive & The goal is significant expansion in Finland and in the northern Baltic region .    |   Solaris Outlines Broad Porphyry Deposit in First FollowUp Holes at Warintza West Discovery VANCOUVER, British Columbia, Oct. 13, 2022 Solaris Resources Inc. ??laris??or ??e Company?? is pleased to report assay results from the first series of holes following up on the discovery of Warintza West within its Warintza Project ??rintza??or ??e Project?? in southeastern Ecuador. Highlights are listed below, with a corresponding image in Figure 1 and detailed results in Tables 12.    |   Deluxe Reports Fourth Quarter 2019 Results and Record Full Year Revenue \\
+MLP & Wrong & Positive & Neutral & Ramirent is a leading company in machinery and equipment rentals for construction and industry .    |   ECONX December University of Michigan Consumer Sentiment Prelim 99.2 vs 96.5 consensus??    |   BAM 3 Reasons Brookfield Is A MustOwn DividendGrowth Stock. Get more info on Seeking Alpha?? \\
+Transformer & Correct & Negative & Negative & Finnish technology company Raute Corporation issued on Tuesday a profit warning for the financial year 2008 .    |   Samsung currently occupies third place and lost ground during the quarter , dropping by 1.8 to an 11.1 share overall .    |   OPEC slashed forecasts for global oil demand as the coronavirus hits fuel use in China \\
+Transformer & Correct & Neutral & Neutral & Nike sets strategy in South America    |   The start of the negotiations , relating to Glaston 's efficiency program , was announced in October .    |   2020 the year investors fall in love with stocks again? \\
+Transformer & Correct & Positive & Positive & In January , traffic , measured in revenue passenger kilometres RPK , went up by 3.2 and capacity , measured in available seat kilometres ASK , rose by 12.2 .    |   The acquisition of Elektros Pavara completes KONE 's market expansion strategy in the Baltic Countries .    |   Adjusted for changes in the Group structure , the Division 's net sales increased by 1.7 . \\
+Transformer & Wrong & Negative & Neutral & Tullow Oil diminishing reserves    |   BXC Form S3 BlueLinx Holdings Inc.    |   The offer , deemed too low by Finnlines ' board , stands until 4 pm tomorrow . \\
+Transformer & Wrong & Neutral & Negative & Volatility still remains near alltime lows across some major currency pairs, including the euro versus the dollar,?? \\
+Transformer & Wrong & Neutral & Positive & The goal is significant expansion in Finland and in the northern Baltic region .    |   SINT familiar name. Loading zone. Worth a trade again. There is a gap to fill. \\
+Transformer & Wrong & Positive & Neutral & Ramirent is a leading company in machinery and equipment rentals for construction and industry .    |   ECONX December University of Michigan Consumer Sentiment Prelim 99.2 vs 96.5 consensus??    |   TENB Cowen sees upside in TENB's Indegy purchase \\
+\end{longtable}

@@ -1,0 +1,168 @@
+Introduction:
+- Have you ever wondered if news headlines can affect market dynamics?
+- It can be possible.
+- Today, I will show that with the right dataset and models, we could analyse this 
+relationship.
+- Let's dive in!
+
+Slide 1 - Background
+Okay, so here's the thing. Traditional financial models are all about numbers—stock prices, 
+economic data, GDP, all that quantitative stuff. But there's a problem: they're missing emotion. 
+News headlines shape how investors feel, and emotions literally drive market movements.
+
+Now, people have studied social media sentiment before. Twitter vibes, Reddit posts, all that. 
+But financial news headlines? That's actually been less researched, even though it probably matters
+way more. It's more official, more trusted.
+
+Here's where it gets interesting: traditional machine learning methods—like Logistic Regression—r
+equire you to manually pick features. You have to decide what words matter. That's hard, especially
+in finance where language is subtle and nuanced.
+
+But deep learning? Models like LSTMs and Transformers can automatically learn what matters. 
+They find patterns you wouldn't think to look for. And FinBERT—which is BERT trained specifically
+on financial text—is even better. It already understands finance.
+
+But here's my question: if FinBERT is already so good, does adding a more complex architecture
+on top actually help? Or do you just get slightly better results for way more compute?
+
+Slide 2 - Dataset Overview
+For this project, I used data from a repository of large datasets, perfect for these neural models, 
+called HuggingFace.
+- The dataset contains news headlines from various sources, along with their corresponding
+sentiment labels (positive, negative, neutral).
+
+Here's the thing though: it's imbalanced. About 62.5% are neutral, 25% positive, 12.5% negative. 
+That matters because models naturally get better at predicting the majority class. 
+So right from the start, all models will be biased toward saying "neutral."
+
+The task is straightforward: predict sentiment. Given a headline, classify it as positive, negative,
+or neutral. That's multi-class classification.
+
+Slide 3 - Methods
+- When completing natural language processing, the first step is to transform the text data into 
+a form that these networks can understand. The main way we did this was using FinBERT,
+which is a pre-trained language model specifically designed for financial text. As well as using 
+TF-IDF vectorization for baseline.
+
+Next, is where the fun starts - the models!
+- We experimented with several neural network architectures, including:
+    - MLP (Multilayer Perceptron)
+    - LSTM (Long Short-Term Memory)
+    - and a Transformer model.
+
+Each model gave a different approach to learning patterns in the text data.
+but ultimately, outputed a sentiment prediction for each headline.
+
+Slide 4 - Models
+
+- Starting with a simple 3 Layer MLP, regularised using dropout and layer normalisation.
+- Next, we had the bidirectional LSTM model with attention, which is designed to handle sequential data like text.
+- Finally, we had the Transformer model, which uses self-attention mechanisms to capture relationships in the text more effectively.
+- As you can see the models get more complex as we go along, but does that mean better performance?
+
+Slide 5 - Results
+
+Okay, so yes, complexity does help. But not the way you'd think.
+
+Look at the accuracy column in the table. Let's see:
+
+Logistic Regression: 85.4%
+MLP: 88.2%
+LSTM: 89.7%
+Transformer: 90.3%
+
+So the answer is: yes, complexity does equal better accuracy. Each step up the complexity ladder,
+we get higher accuracy.
+
+But—and this is important—look at how much we gain at each step. Going from Logistic Regression to MLP?
+ 2.8 percentage points. MLP to LSTM? 1.5 points. LSTM to Transformer? Only 0.6 points.
+
+So yes, complexity helps. But the gains are getting smaller. That's the key insight. 
+More complexity doesn't mean proportionally more accuracy, potentially due to dataset size being the limiting 
+factor.
+
+Look at those confusion matrices on the right. They tell the story.
+
+Tthe black boxes right in the center of each matrix? That's neutral sentiment. 
+The models got really good at predicting neutral. Why? Because 62.5% of the data is neutral. 
+The models learned that's the safe prediction.
+
+Now look at the edges—top left and bottom right. Those areas are much lighter.
+That's negative and positive sentiment. The models made more mistakes there.
+
+Look at the F1 scores: neutral gets 0.84 to 0.88, but negative sentiment only hits 0.81 to 0.82.
+That's the imbalance showing up in the metrics.
+
+So here's the answer to this question: Yes, bias and imbalance heavily affect performance. 
+The models are biased toward the majority class because that's what's dominant in the data.
+ But that bias also means they're worse at the minority classes.
+
+One more thing—look at the off-diagonal errors. Some headlines were positive but got labeled neutral.
+Some were negative but got called neutral. That's the implicit sentiment problem. 
+Headlines describing strengths without explicit growth language confuse the model. It defaults to neutral.
+
+Now look at the bottom of the table: training time.
+
+Logistic Regression: 0.057 minutes
+MLP: 32.578 minutes
+LSTM: 32.602 minutes
+Transformer: 35.226 minutes
+
+So Logistic Regression trains in less than a tenth of a minute. The neural models? 32 to 35 minutes. 
+That's 570 to 620 times longer.
+
+Now the question is asking: is training time less important than accuracy? Or should we trade compute 
+for performance?
+
+Here's the honest answer: it depends.
+
+If you need the best possible accuracy and you can afford the compute time?
+ Then Transformer at 90.3% is worth the extra 35 minutes.
+
+But if you're thinking practically? MLP gets you 88.2% accuracy in 32.6 minutes. 
+That's pretty damn good. For most real-world applications, that might be enough. 
+And it's only 570 times longer than Logistic Regression—versus Transformer at 620 times longer.
+
+Or if you need speed above all else? Logistic Regression is done in seconds.
+
+So the real answer is: Don't automatically trade accuracy for speed or vice versa. 
+Think about your actual requirements. A 0.6% jump in accuracy (LSTM to Transformer)
+doesn't justify 3% more training time for everyone.
+
+Slide 6 - Limitations + Future Work
+
+Before I wrap up, I want to be real about the limitations because they're important.
+
+Limitation one: Data imbalance.
+62.5% neutral skews everything. All models learned to exploit this. 
+They're better at neutral but worse at the hard classes. That's realistic,
+but it means minority class performance suffers. If you're trying to catch negative sentiment, 
+these models will miss stuff.
+
+Limitation two: I only trained each model once.
+Yeah, I know. With computational constraints, I couldn't run multiple training sessions with 
+different random seeds. So I can't say definitively whether differences are real or just random. 
+Ideally I'd do 5 runs and report confidence intervals.
+
+Limitation three: I used frozen FinBERT.
+I didn't fine-tune it on my data. That was a practical choice—saves time and memory, 
+and it prevented overfitting on imbalanced data. But it meant the model couldn't adapt to
+the specific quirks of financial news. Fine-tuning could probably increase accuracy. 
+Is it worth the extra training time? That's a trade-off.
+
+But here's the good news: these limitations point to exactly what should happen next.
+
+To improve the dataset imbalance, techniques like data augmentation or synthetic data generation
+could help. Or collecting more negative sentiment headlines.
+
+For the training variability, running multiple experiments with different seeds would give
+more robust results, allowing for the calculation of confidence intervals and statistical significance testing.
+
+And finally, fine-tuning FinBERT on this specific dataset could unlock better performance,
+allowing the model to better capture the nuances of financial news headlines.
+
+
+
+
+
+

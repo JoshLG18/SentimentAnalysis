@@ -8,181 +8,329 @@
 \usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{float}
-
-
+\usepackage{pdflscape}
+\usepackage{longtable}
+\usepackage{titling}
+\usepackage{array}
+\usepackage{rotating}
+\usepackage{cite}
 \usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage[labelfont=bf,textfont=bf]{caption}
+
+
 \pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0pt}
 \setlength{\headheight}{40pt} 
-\usepackage[a4paper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+\usepackage[a4paper,top=2cm,bottom=2cm,left=2cm,right=2cm,marginparwidth=1.75cm]{geometry}
 
 \begin{document}
 
 %-------------------------------------------------------%
 
 \title{\bf Comparative Evaluation of Neural Architectures for Sentiment Analysis on Financial News: From MLPs to Transformers}
+
+\vspace{-5em}
+
 \author{Josh Le Grice - 720017170}
 \date{}
 \maketitle
 \thispagestyle{fancy}
-\vspace{-4em}
+\vspace{-6em}
 
 
 %-------------------------------------------------------%
 \section{Introduction}
+
+\vspace{-0.5em}
+
 % Background and motivation: why this question matters.
 % Clear statement of your research question.
 % Context or prior work if relevant.
-Traditional financial models are fully reliant on quantative inputs such as stock prices and macroeconomic indicators.
-Yet, these indicators rarely capture the full picture of market behaviour.
-In recent years, there has been growing interest in integrating sentiment analysis to account for the emotional and 
-psychological factors that influence investor decisions (Atkins, 2018).
-Among text sources social media has recieved the majority of research within the industry, on the other hand, 
-news content has recieved less attention despite its proven potential (Ashtiani, 2023).
+Traditional financial models tend to focus on quantitative inputs such as stock prices and macroeconomic indicators.
+However, these inputs rarely capture the full picture of market behaviour\cite{Atkins2018-tq}.
+In light of this, there has been growing interest in integrating sentiment analysis to account for the emotional and 
+psychological factors that influence investor decisions\cite{Atkins2018-tq}. In previous research, 
+social media has received the majority of discussion within this area, with 
+news content receiving less attention despite its proven potential\cite{Ashtiani2023-su}.
 
-While traditional machine learining (ML) methods provided a foundation for sentiment analysis, they underperform in more complex domains like finance. 
-ML models rely on domain-specific feature enigneering limiting their ability to understand complex or subtle sentiments which are frequent in finacial news (Bashiri and Naderi, 2024).
-This can also introduce bias, reducing generalisability and their power in unseen datasets.
-Deep learning methods such as RNNs, LSTMs and Transformers offer a more accurate alternative, stemming from their ability to capture sequential patterns, 
-making them better suited for analysing sentiment in financial news (Bashiri and Naderi, 2024).
+Traditional machine learning (ML) methods provide a foundation for sentiment analysis but they may underperform in more complex 
+domains like finance, due to the need for domain-specific feature engineering, limiting their ability to understand complex or subtle sentiments that 
+are common in financial news\cite{Bashiri2024-hw}.
+Manual feature engineering can potentially introduce bias, leading to reduced generalisability in unseen datasets, a critical consideration when making
+financial market predictions. To combat this, deep learning methods such as RNNs, LSTMs and Transformers offer a more accurate alternative, stemming from their ability 
+to capture sequential patterns, making them better suited for analysing sentiment in financial news\cite{Bashiri2024-hw}.
 
-FinBERT, developed by Huang, Wang, and Yang (2022), is a finance-specific language model based on BERT but trained on financial documents and news. 
-It significantly outperforms general-purpose models and other ML methods, e.g. BERT, Naive Bayes and LSTMs,
-in extracting sentiment and insights from financial text, proving that these more complex methods hold value in sentiment analysis and stock market prediction.
+For example, FinBERT, developed by Huang et al.\cite{Huang2023-zl}, is a finance-specific language model trained on 
+financial documents and news. 
+It outperforms general-purpose BERT and other ML methods, e.g. Naive Bayes and LSTMs,
+in extracting sentiment from financial text, highlighting its advantages in domain-specific deep learning models\cite{Huang2023-zl}.
+However, while FinBERT provides accurate embeddings, the choice of neural architecture used as a classifier on top of these embeddings
+may impact performance\cite{DevlinJacob2018BPoD}. These trade-offs between complexity and accuracy are scarcely researched in the
+finance domain.
 
-This project compares multiple neural architectures to evaluate which best captures financial sentiment from news headlines, 
-with the aim of identifying patterns that could identify market movement more effectively than traditional data alone.
+This project compares multiple neural architectures when classifying 
+sentiment in financial news headlines, investigating whether architectural complexity leads to performance gains.
+While sentiment predictions could inform market movements, evaluating this link is beyond the scope of this project, and will be discussed
+in future work.
 
+\vspace{-1em}
 
 %-------------------------------------------------------%
 \section{Dataset Description}
+
+\vspace{-0.5em}
+
 % Source of the dataset.
 % Key features, size, and any notable characteristics.
 % Any pre-processing steps applied (cleaning, feature selection, transformations).
-This project uses the \textit{English Financial News} dataset (Calarte, 2023), which contains approximately 27,000 
+This project uses the \textit{English Financial News} dataset\cite{Calarte2023-mh}, which contains approximately 27,000 
 financial news headlines collected from Twitter and Yahoo Finance. Each headline is labelled as \textit{positive}, 
-\textit{negative}, or \textit{neutral} according to its expressed sentiment. 
+\textit{negative}, or \textit{neutral} based on its perceived sentiment. 
 
-The dataset was selected due to its large and diverse corpus of real-world financial language, which closely represents 
-the types of news and social media content that influence investor sentiment and market movements. 
+The dataset was selected due to its large and diverse corpus of real-world financial language, which clearly shows 
+the types of news content that influence investor sentiment and market movements. 
 
 Given the unstructured nature of textual data, preprocessing was required before training the models. 
 The following steps were applied:
 
+\vspace{-0.6em}
+
 \begin{itemize}
-    \item Removal of URLs, stock tickers, special symbols, and extraneous whitespace.
-    \item Tokenisation and vectorisation of each sentence to convert text into numerical form suitable for neural network input.
+    \item Removal of URLs, stock tickers, special symbols, and unnecessary whitespace.
+    \item Tokenisation and vectorisation of each sentence - to convert text into numerical vectors suitable for neural network input.
 \end{itemize}
 
-The dataset was split into training (80\%) and testing (20\%) subsets to enable model evaluation. 
-While well-suited for sentiment classification tasks, the dataset exhibits a mild class imbalance, 
-with \textit{neutral} sentiment being most common. This imbalance was accounted for during model training through 
-appropriate sampling and weighting techniques.
+\vspace{-0.6em}
+
+The dataset was split into training (80\%) and testing (20\%) sets to enable model evaluation. 
+While well-suited for sentiment classification tasks, the dataset contains a class imbalance, 
+with \textit{neutral} sentiment being most common (62.5\%). This imbalance was addressed during model training through 
+stratified sampling and weighted metrics to mitigate
+bias towards the majority \textit{neutral} class.
+
+\vspace{-1em}
 
 %-------------------------------------------------------%
 \section{Methods}
+
+\vspace{-0.5em}
+
 % Description of ML techniques applied (regression, classification, clustering, etc.).
 % Justification of method choice.
 % Any assumptions made and rationale.
 
-This project defines financial sentiment prediction as a three-class classification problem, 
-labelling each headline as positive, neutral or negative. A baseline TF-IDF + Logistic Regression model 
-was compared with three neural architectures (MLP, LSTM and Transformer) trained on FinBERT
- contextual embeddings from ProsusAI (2023).
+This project treats financial news sentiment prediction as a three-class classification problem, 
+labelling each headline as \textit{positive}, \textit{negative}, or \textit{neutral}. A baseline TF-IDF + Logistic Regression model 
+was compared with three neural architectures: Multi-Layer Perceptron (MLP), Long Short-Term Memory (LSTM), and Transformer, trained on FinBERT
+contextual embeddings from Prosus AI\cite{ProsusAI2023-yv}.
 
-The baseline used TF-IDF features and classified using Logistic Regression,
- which is commonly included in previous research (Karanikola et al., 2023)
+The baseline uses TF-IDF embeddings\cite{HavrlantLukáš2017Aspe} and Logistic Regression classification\cite{alma991015141909707446},
+which is commonly included in similar research\cite{Karanikola2023-rh}, allowing for a comparison between
+FinBERT-based models and traditional feature engineering approaches.
+For neural architectures, each headline was encoded using pre-trained FinBERT embeddings\cite{Huang2023-zl}.
+As stated in Section 1, FinBERT typically outperforms general-purpose models in financial text tasks due to its domain-specific training, 
+making it a strong foundation for this sentiment classification task.
+These embeddings were then passed through three classification architectures: an MLP with ReLU activation\cite{Goodfellow2023-tx} as
+a neural baseline, 
+a bidirectional LSTM to model sequential relationships\cite{Sharaff2023-cy}, 
+and a Transformer with self-attention\cite{Vaswani2017-dz} as a state-of-the-art architecture. 
 
-Each headline was encoded using FinBERT (Huang, Wang and Yang, 2022), which generates 
-contextual and positional embeddings, as it had been shown to outperform 
-general-purpose models in financial sentiment tasks (Huang, Wang and Yang, 2022). These embeddings 
-were then passed through three architectures: an MLP with ReLU activation (Goodfellow et al., 2023), 
-a bidirectional LSTM to model sequential relationships (Sharaff et al., 2023), 
-and a lightweight Transformer with self-attention (Vaswani et al., 2017).
+Due to computational constraints, all neural models were trained only once, on a T4 GPU, with a single set of hyperparameters, on 
+80\% of the data and evaluated on the remaining 20\% 
+using various performance metrics. Full details on training parameters, optimisation, regularisation, and architectures
+are provided in Appendix A (Table~\ref{extended_methods}), along with training dynamics which can be found in 
+Appendix C (Figures~\ref{fig:mlp_training_history}, \ref{fig:lstm_training_history}, and \ref{fig:transformer_training_history}).
 
-All models were trained on 80\% of the data with early stopping and evaluated on the remaining 20\% 
-using various performance metrics. Full details on training parameters, metrics and architecture 
-configurations are provided in the appendix.
+\vspace{-1em}
 
 %-------------------------------------------------------%
 \section{Results}
+
+\vspace{-0.5em}
+
 % Key findings from your analysis.
 % Visualisations: plots, tables, and figures to illustrate patterns or model performance.
 % Concise description of results (focus on insights, not raw outputs).
 
-Summarise main findings, supported by figures and tables.
-Place figures in the third page of the report using $\verb|\begin{figure}...\end{figure}|$ and reference them in text using $\verb|\ref{}|$. For instance, see Figure~\ref{fig:example}.
+Results indicate that all FinBERT-based neural architectures significantly outperformed the TF-IDF + Logistic Regression baseline,
+highlighting the importance of high-quality embeddings in financial sentiment analysis.
+Furthermore, increasing architectural complexity led to classification improvements, albeit with diminishing returns.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+The Transformer architecture achieved the highest overall accuracy at 90.3\% followed by LSTM (89.7\%),
+MLP (88.2\%) and Logistic Regression (85.4\%) (Table~\ref{tab:summary_results}). Macro F1-scores
+ranged from 0.814 to 0.876, indicating consistent performance gains across all 
+sentiment classes, while ROC-AUC scores (0.942 -- 0.969) demonstrated strong classification 
+performance even for the baseline model.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+However, neural architectures required 32.6 -- 35.2 minutes of training 
+compared to 0.057 minutes for Logistic Regression, a 570 -- 620× increase for 2.8\% (MLP), 4.3\% (LSTM), 4.9\% (Transformer)
+absolute accuracy gain. Confusion Matrices (Figure~\ref{fig:confusion_matrices}) and detailed per-class metrics (Appendix B, Table~\ref{tab:full_appendix_metrics}) 
+show that neutral sentiment classification was strongest across all architectures, while negative sentiment 
+remained most challenging, indicating potential issues caused by the imbalances within the dataset. Finally, 
+qualitative analysis of test predictions revealed consistent struggles
+with subtle positive sentiment when lacking clear growth indicators, with the models often classifying these
+headlines into the neutral class (Appendix B, Table~\ref{tab:text_analysis}).
+
+\vspace{-1em}
 
 %-------------------------------------------------------%
-\section{Discussions}
+\section{Discussion}
+
+\vspace{-0.5em}
+
 % Interpretation of results: what do they mean in the context of your research question?
 % Critical evaluation of methods used: advantages, disadvantages, trade-offs.
 % Limitations of dataset or analysis.
-Discuss results interpretation, advantages/disadvantages of choices, trade-offs, and limitations.
+The improvement in performance from Logistic Regression to the Transformer demonstrates that more
+complex architectures improve financial sentiment classification. Although the gains between 
+FinBERT-based models were small (MLP to Transformer: 2.1\%), suggesting an element of diminishing
+returns once you have high-quality embeddings these small gains could be important in high-stakes financial settings, 
+where even small improvements can have large financial implications.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+The Transformer's self-attention mechanism\cite{Vaswani2017-dz}
+helped with technical financial language, but whether this justifies the 8\% increase in training time
+when compared to the other neural architectures is unclear, especially when all models already 
+achieved high ROC-AUC scores.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+Despite promising results, there were a few limitations that affected this research. The dataset
+was skewed towards neutral sentiment (62.5\%), causing all models to perform better on the neutral 
+class (F1: 0.898 - 0.931) than negative classes (F1: 0.733 - 0.830). Additionally, keeping FinBERT embeddings
+frozen saved model training time but prevented dataset-specific fine-tuning. Furthermore, test 
+examples showed that all models struggled with implicit positive sentiment, where headlines described
+a company's strengths rather than clear growth language. This suggests that capturing subtle
+financial sentiment remains a challenge regardless of architectural choice. 
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+When deploying these in practice, simpler models might be preferable if frequent retraining is needed, 
+while the Transformer's accuracy could justify its complexity for strategic decision-making. Furthermore, 
+in high-stakes financial applications, the interpretability of simpler models like Logistic Regression or Tree-based methods
+might be more desirable, introducing the need for SHAP or LIME analyses on neural models\cite{LundbergScott2017AUAt},\cite{RibeiroMarcoTulio2016SIT}.
+
+\vspace{-1em}
 
 %-------------------------------------------------------%
 \section{Conclusions}
+
+\vspace{-0.5em}
+
 % Summary of key takeaways.
 % Suggestions for future work or extensions.
-Summarise key takeaways and possible future work.
+This project compared four approaches to sentiment classification in financial news headlines, showing that
+architectural complexity provides measurable performance improvements.
+Transformers showed the best performance; however, gains over simpler FinBERT-based neural models were small.
+The results suggest that high-quality embeddings may matter more than classifier architectural complexity, with all
+neural models clearly outperforming the baseline. However, statistical significance testing is required
+to provide definitive conclusions. 
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+Future work should address the class imbalance through data augmentation and explore whether FinBERT 
+embeddings improve performance enough to justify the increased training cost, as well as using more extensive
+model optimisation and discussing statistical significance.
+Additionally, future research could explore the practical application of these models by evaluating if 
+these sentiment predictions can inform market movements more accurately than traditional quantitative models.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-
+\vspace{-1em}
 %-------------------------------------------------------%
 % Figures and tables
-\clearpage
+\section*{Figures \& Tables}
+\vspace{-1em}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{../results/figures/confusion_matrices.pdf}
+\vspace{-1em}
+\caption{Confusion Matrices for All Models (Logistic Regression, MLP, LSTM, and Transformer)}
+
+This figure shows the classification performance across all four models on the test set. Darker cells indicate higher prediction frequencies.
+All models performed best on the neutral sentiment, with negative sentiment classification shown to be most difficult. The Transformer achieved the highest
+true positive values indicating higher overall performance, while the Logistic Regression baseline shows more misclassifications.
+
+\label{fig:confusion_matrices}
+
+\end{figure}
+
+\vspace{-3em}
+
+% add summary table
+\begin{table}[H]
+\centering
+\input{../results/figures/summary_results.tex}
+\vspace{-1em}
+Table 1 shows the summary of model performance across all architectures evaluated on the test set. The Transformer demonstrates the highest performance
+across all classes, followed by the LSTM and MLP. All FinBERT based models clearly outperform the baseline. Training times for neural architectures were
+570 -- 620x longer than the baseline, representing a large computational trade-off for 4.9\% accuracy increase. ROC-AUC scores above 0.94 across all
+models indicate strong classification ability.
+\end{table}
+
+
 
 %-------------------------------------------------------%
 \clearpage
 % Include your references here.
-\bibliographystyle{plain}
-\bibliography{references}
+\begin{spacing}{0.5}
+    \bibliographystyle{IEEEtran}
+    \bibliography{../references/references}
+\end{spacing}
+
+\vspace{-1em}
 
 %-------------------------------------------------------%
 \section*{Link to Presentation}
+
+\vspace{-0.5em}
+
 % Provide the URL to your pre-recorded presentation.
-\href{http://url.to.your.video.presentation/make_sure_permissions_are_granted}{http://url.to.your.video.presentation/make-sure-permissions-are-granted}
+\url{https://youtu.be/4NpsymyU5d8}
+
+\vspace{-1em}
+
+%-------------------------------------------------------%
+\section*{AI Declaration}
+
+\vspace{-0.5em}
+
+In line with the University of Exeter's academic integrity policy, 
+I declare the use of Generative AI (GenAI) as a supporting tool in this report.
+My use aligns with the AI-supported assessment guidelines for this module.
+
+\vspace{-0.5em}
+
+\begin{itemize}
+\item \textbf{Tools Used:}
+ 
+    \vspace{-0.5em}
+
+    \begin{itemize}
+        \item Gemini
+        \item Perplexity
+    \end{itemize}
+
+    \vspace{-0.5em}
+
+\item \textbf{Purpose of Use:}
+ 
+    \vspace{-0.5em}
+
+    \begin{itemize}
+        \item Research Planning - Provide feedback on the scope of my research question
+        \item Draft Review - Review and give feedback on drafts including grammatical accuracy, punctuation,
+         and suggesting improvements.
+    \end{itemize}
+
+    \vspace{-0.5em}
+
+\end{itemize}
+   
+
+Specific prompts and outputs are listed within these links:
+
+\noindent \textbf{Gemini:} \url{https://gemini.google.com/share/70a841eda8f0}
+
+\noindent \textbf{Perplexity:} \url{https://www.perplexity.ai/search/don-t-delete-lfd-prompts-qicweTQCR2mG8N4xQW4i0A#3}
+
+
+
+
 
 %-------------------------------------------------------%
 \clearpage
@@ -197,6 +345,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 \begin{table}[H]
 \centering
 \caption{Summary of Methods and Model Architectures}
+\label{extended_methods}
+\renewcommand{\arraystretch}{2.6}  
 \begin{tabularx}{\textwidth}{@{} l X @{}}
 \toprule
 \textbf{Component} & \textbf{Description / Configuration} \\
@@ -207,7 +357,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 \begin{itemize}
     \vspace{-1em}
     \item Lowercased all text
-    \item Removed URLs, stock tickers (e.g., \texttt{\$AAPL}), special characters
+    \item Removed URLs, stock tickers (e.g., \$AAPL), special characters
     \item Removed extra whitespace
 \end{itemize} \\
 
@@ -216,9 +366,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 \textbf{Tokenisation and Embeddings} &
 \begin{itemize}
     \vspace{-1em}
-    \item Used \texttt{ProsusAI/finbert} (ProsusAI, 2023) tokenizer from Hugging Face
+    \item Used ProsusAI/finbert (ProsusAI, 2023) tokenizer from Hugging Face
     \item Truncated input sequences to a maximum length of 64 tokens
-    \item No padding at tokenisation step; applied dynamically during batching
     \item Extracted 768-dimensional [CLS] embeddings from FinBERT
 \end{itemize} \\
 
@@ -228,9 +377,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 \begin{itemize}
     \vspace{-1em}
     \item \textbf{Baseline:} TF-IDF + Logistic Regression
-    \item \textbf{MLP:} Three fully connected layers (768 $\rightarrow$ 256 $\rightarrow$ 128 $\rightarrow$ 64) with ReLU activations, dropout (0.3), and LayerNorm; output fed to a softmax classifier.
+    \item \textbf{MLP:} Three fully connected layers (768 $\rightarrow$ 256 $\rightarrow$ 128) with ReLU activations, dropout (0.3), and LayerNorm; output fed to a softmax classifier.
     \item \textbf{LSTM:} Three-layer bidirectional LSTM (hidden size = 256) with dropout (0.3), followed by LayerNorm, an attention layer, and a final classification layer for 3-class output.
-    \item \textbf{Transformer:} Four-layer Transformer Encoder with 8 attention heads, feedforward dim = 256, LayerNorm before/after encoding, followed by a two-layer MLP classifier.
+    \item \textbf{Transformer:} Four-layer Transformer Encoder with 8 attention heads, Feedforward Dimension of 256, LayerNorm before/after encoding, followed by a two-layer MLP classifier.
     \item All models use FinBERT contextual embeddings as frozen input features.
 \end{itemize} \\
 
@@ -239,10 +388,11 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 \textbf{Training Process} &
 \begin{itemize}
     \vspace{-1em}
+    \item All models trained on Google Colab's T4 GPU
     \item Loss Function - CrossEntropy Loss with L2 Regularisation and Label Smoothing
     \item Optimiser - AdamW with learning rate of $1 \times 10^{-4}$
     \item Gradient clipping at max norm of 1.0 to prevent exploding gradients
-    \item Applied early stopping with a patience of 5 epochs (monitored validation loss)
+    \item Applied early stopping with a patience of 5 epochs, monitoring validation loss
     \item Trained for a maximum of 100 epochs with batch size of 64
     \item FinBERT parameters frozen to reduce training time and memory usage
 \end{itemize} \\
@@ -251,6 +401,58 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 \end{tabularx}
 \end{table}
 
+%-------------------------------------------------------%
+\clearpage
+\section*{Appendix B - Extended Results}
+\vspace{-1.5em}
+\input{../results/figures/full_appendix_metrics.tex}
+
+\begin{landscape}
+    \input{../results/figures/text_analysis.tex}
+\end{landscape}
+
+%-------------------------------------------------------%
+\clearpage
+\section*{Appendix C - Training Dynamics}
+\vspace{-1.5em}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../results/figures/mlp_training_history.png}
+\vspace{-1.5em}
+\caption{MLP Training Dynamics}
+Training and validation loss/accuracy curves for the MLP model over the training process.
+The model converged at epoch 16 with stable validation performance and minimal overfitting, achieving 88.2\% accuracy.
+
+\label{fig:mlp_training_history}
+\end{figure}
+
+\vspace{-1em}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../results/figures/lstm_training_history.png}
+\vspace{-1.5em}
+\caption{LSTM Training Dynamics}
+Training and validation loss/accuracy curves for the LSTM model over the training process.
+The model reached best performance at epoch 12 with 89.7\% accuracy, showing a smooth convergence
+with slight validation changes.
+
+\label{fig:lstm_training_history}
+\end{figure}
+
+\vspace{-1em}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../results/figures/transformer_training_history.png}
+\vspace{-1.5em}
+\caption{Transformer Training Dynamics}
+Training and validation loss/accuracy curves for the Transformer model over the training process.
+Best performance achieved at epoch 11 with 90.3\% validation accuracy, demonstrating stable learning progression with minimal train-validation gap.
+
+\label{fig:transformer_training_history}
+\end{figure}
 
 %-------------------------------------------------------%
 \end{document}
