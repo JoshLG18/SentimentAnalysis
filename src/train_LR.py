@@ -145,3 +145,8 @@ def train_baseline_tfidf_lr(save_path="../results/saved_models/tfidf_lr.pkl"):
 # Run baseline model when script is run
 if __name__ == "__main__":
     train_baseline_tfidf_lr()
+
+# References:
+# https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression
+# https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html
+# https://scikit-learn.org/stable/api/sklearn.metrics.html

@@ -58,7 +58,7 @@ news content receiving less attention despite its proven potential\cite{Ashtiani
 Traditional machine learning (ML) methods provide a foundation for sentiment analysis but they may underperform in more complex 
 domains like finance, due to the need for domain-specific feature engineering, limiting their ability to understand complex or subtle sentiments that 
 are common in financial news\cite{Bashiri2024-hw}.
-Manual feature engineering can potentially introduce bias, leading to reduced generalisability in unseen datasets, a critical consideration when making
+Manual feature engineering can potentially introduce bias, leading to reduced generalisability on unseen datasets, a critical consideration when making
 financial market predictions. To combat this, deep learning methods such as RNNs, LSTMs and Transformers offer a more accurate alternative, stemming from their ability 
 to capture sequential patterns, making them better suited for analysing sentiment in financial news\cite{Bashiri2024-hw}.
 
@@ -99,7 +99,7 @@ The following steps were applied:
 
 \begin{itemize}
     \item Removal of URLs, stock tickers, special symbols, and unnecessary whitespace.
-    \item Tokenisation and vectorisation of each sentence - to convert text into numerical vectors suitable for neural network input.
+    \item Tokenisation and vectorisation of each sentence to convert text into numerical vectors suitable for neural network input.
 \end{itemize}
 
 \vspace{-0.6em}
@@ -124,14 +124,14 @@ bias towards the majority \textit{neutral} class.
 This project treats financial news sentiment prediction as a three-class classification problem, 
 labelling each headline as \textit{positive}, \textit{negative}, or \textit{neutral}. A baseline TF-IDF + Logistic Regression model 
 was compared with three neural architectures: Multi-Layer Perceptron (MLP), Long Short-Term Memory (LSTM), and Transformer, trained on FinBERT
-contextual embeddings from Prosus AI\cite{ProsusAI2023-yv}.
+embeddings from Prosus AI\cite{ProsusAI2023-yv}.
 
 The baseline uses TF-IDF embeddings\cite{HavrlantLukáš2017Aspe} and Logistic Regression classification\cite{alma991015141909707446},
 which is commonly included in similar research\cite{Karanikola2023-rh}, allowing for a comparison between
 FinBERT-based models and traditional feature engineering approaches.
 For neural architectures, each headline was encoded using pre-trained FinBERT embeddings\cite{Huang2023-zl}.
 As stated in Section 1, FinBERT typically outperforms general-purpose models in financial text tasks due to its domain-specific training, 
-making it a strong foundation for this sentiment classification task.
+making it a strong foundation for this sentiment classification task\cite{Huang2023-zl}.
 These embeddings were then passed through three classification architectures: an MLP with ReLU activation\cite{Goodfellow2023-tx} as
 a neural baseline, 
 a bidirectional LSTM to model sequential relationships\cite{Sharaff2023-cy}, 
@@ -366,7 +366,7 @@ Specific prompts and outputs are listed within these links:
 \textbf{Tokenisation and Embeddings} &
 \begin{itemize}
     \vspace{-1em}
-    \item Used ProsusAI/finbert (ProsusAI, 2023) tokenizer from Hugging Face
+    \item Used ProsusAI/finbert\cite{ProsusAI2023-yv} tokenizer from Hugging Face
     \item Truncated input sequences to a maximum length of 64 tokens
     \item Extracted 768-dimensional [CLS] embeddings from FinBERT
 \end{itemize} \\
@@ -380,7 +380,7 @@ Specific prompts and outputs are listed within these links:
     \item \textbf{MLP:} Three fully connected layers (768 $\rightarrow$ 256 $\rightarrow$ 128) with ReLU activations, dropout (0.3), and LayerNorm; output fed to a softmax classifier.
     \item \textbf{LSTM:} Three-layer bidirectional LSTM (hidden size = 256) with dropout (0.3), followed by LayerNorm, an attention layer, and a final classification layer for 3-class output.
     \item \textbf{Transformer:} Four-layer Transformer Encoder with 8 attention heads, Feedforward Dimension of 256, LayerNorm before/after encoding, followed by a two-layer MLP classifier.
-    \item All models use FinBERT contextual embeddings as frozen input features.
+    \item All models use FinBERT embeddings as frozen input features.
 \end{itemize} \\
 
 \midrule
@@ -391,8 +391,8 @@ Specific prompts and outputs are listed within these links:
     \item All models trained on Google Colab's T4 GPU
     \item Loss Function - CrossEntropy Loss with L2 Regularisation and Label Smoothing
     \item Optimiser - AdamW with learning rate of $1 \times 10^{-4}$
-    \item Gradient clipping at max norm of 1.0 to prevent exploding gradients
-    \item Applied early stopping with a patience of 5 epochs, monitoring validation loss
+    \item Gradient clipping to prevent exploding gradients
+    \item Early stopping with a patience of 5 epochs, monitoring validation loss
     \item Trained for a maximum of 100 epochs with batch size of 64
     \item FinBERT parameters frozen to reduce training time and memory usage
 \end{itemize} \\

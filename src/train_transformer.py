@@ -103,3 +103,8 @@ training_time = end_time - start_time # work out how long the model was training
 
 # save the metrics and history
 save_metrics_and_history(best_metrics, history, training_time)
+
+# References:
+# https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html
+# https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html
+# https://arxiv.org/abs/1706.03762

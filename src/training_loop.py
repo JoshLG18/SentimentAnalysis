@@ -20,7 +20,7 @@ def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
     # set up the loop for visual progress bar
     loop = tqdm(enumerate(dataloader, start=1), total=len(dataloader), desc="Training")
 
-    for batch_idx, batch in loop: # set up the loop for mini-batching
+    for  batch in loop: # set up the loop for mini-batching
         # inidialise the input data, attention amsk and labels
         input_ids = batch["input_ids"].to(device) 
         attention_mask = batch["attention_mask"].to(device)
@@ -46,7 +46,6 @@ def train_one_epoch(model, dataloader, optimiser, scheduler, criterion, device):
 
     return total_loss / len(dataloader) # return total loss / number of batches
 
-
 # Evaluation
 def evaluate(model, dataloader, criterion, device, tokenizer):
     model.eval() # set the evaluation mode
@@ -59,7 +58,6 @@ def evaluate(model, dataloader, criterion, device, tokenizer):
     # get the original text and labels from the dataset
     dataset_df = dataloader.dataset.to_pandas()
     test_texts = dataset_df["text"].tolist()
-    test_labels = dataset_df["label"].tolist()
 
     with torch.no_grad(): 
         for batch in dataloader: # mini-batching

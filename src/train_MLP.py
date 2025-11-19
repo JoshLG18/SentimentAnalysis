@@ -91,3 +91,7 @@ training_time = end_time - start_time # work out how long the model is training 
 
 # save the metrics and history of the best model
 save_metrics_and_history(best_metrics, history, training_time)
+
+
+# References:
+# https://docs.pytorch.org/docs/stable/index.html

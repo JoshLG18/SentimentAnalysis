@@ -11,7 +11,7 @@ MODEL_NAME = "ProsusAI/finbert" # defines the finbert model used
 
 # Load tokenizer and collator
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME) # load the tokenizer from finbert
-data_collator = DataCollatorWithPadding(tokenizer=tokenizer) # load the colaltor from finbert
+data_collator = DataCollatorWithPadding(tokenizer=tokenizer) # load the collator from finbert to pad sequences
 
 def clean_text(text):
     text = re.sub(r"http\S+|www\S+|https\S+", "", text)   # remove URLs
@@ -59,3 +59,9 @@ def prepare_data(test_size=0.2, random_state=123):
 
 
     return train_loader, test_loader # returns the loaders to be used in the training scripts
+
+
+
+# References:
+# https://huggingface.co/learn/llm-course/en/chapter2/4
+# https://huggingface.co/docs/transformers/en/main_classes/data_collator
