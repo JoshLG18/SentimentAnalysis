@@ -1,4 +1,4 @@
-# 🧠 Comparative Evaluation of Neural Architectures for Sentiment Analysis on Financial News: From MLPs to Transformers
+# Comparative Evaluation of Neural Architectures for Sentiment Analysis on Financial News: From MLPs to Transformers
 
 ## Project Overview
 
